@@ -1,15 +1,12 @@
-import Footer from "./components/footer"
-import Header from "./components/header"
+
+import DashboardLayout from "./layouts/dashboardLayout"
 
 
 function App() {
   
 
   return (
-    <>
-      <Header />
-      <Footer/> 
-    </>
+    <DashboardLayout><></></DashboardLayout>
   )
 }
 

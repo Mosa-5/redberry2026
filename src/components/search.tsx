@@ -1,7 +1,8 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Command } from "cmdk"
 import { cn } from "cn"
 
+import { searchMovies } from "@/API/requests/Catalogue"
 import { Close, MagnifyingGlass, Popcorn } from "@/components/icons"
 import { Button } from "@/components/ui/button"
 
@@ -18,9 +19,6 @@ export type SearchResult = {
 
 
 type SearchProps = {
-  query: string
-  onQueryChange: (query: string) => void
-  results?: SearchResult[]
   onSelect?: (result: SearchResult) => void
   className?: string
 }
@@ -32,17 +30,37 @@ type SearchProps = {
  * cmdk drives the keyboard behaviour — arrow keys move the selection, Enter
  * fires onSelect. Filtering is off because the server returns the matches.
  */
-export function Search({
-  query,
-  onQueryChange,
-  results = [],
-  onSelect,
-  className,
-}: SearchProps) {
+export function Search({ onSelect, className }: SearchProps) {
+  const inputRef = useRef<HTMLInputElement>(null)
   const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState("")
+  const [results, setResults] = useState<SearchResult[]>([])
   const hasQuery = query.length > 0
   const expanded = open || hasQuery
   const showIcon = !(open && !hasQuery)
+
+  useEffect(() => {
+    // `ignore` drops responses that land after a newer query has been typed,
+    // which would otherwise show stale results. TanStack Query will take this
+    // over, along with debouncing and caching.
+    let ignore = false
+    searchMovies(query).then((movies) => {
+      if (ignore) return
+      setResults(
+        movies.map((movie) => ({
+          id: movie.id.toString(),
+          title: movie.title,
+          meta: `${movie.kind} · ${movie.ageRating.code} · ${movie.runtimeMinutes} min`,
+          poster: movie.posterUrl || "",
+          price: movie.fromPrice ? `from ₾${movie.fromPrice}` : undefined,
+          comingSoon: movie.isComingSoon,
+        }))
+      )
+    })
+    return () => {
+      ignore = true
+    }
+  }, [query])
 
   return (
     <Command
@@ -79,8 +97,9 @@ export function Search({
         )}
 
         <Command.Input
+          ref={inputRef}
           value={query}
-          onValueChange={onQueryChange}
+          onValueChange={setQuery}
           onFocus={() => setOpen(true)}
           placeholder="Search films and live events"
           aria-label="Search films and live events"
@@ -93,7 +112,13 @@ export function Search({
         {hasQuery && (
           <button
             type="button"
-            onClick={() => onQueryChange("")}
+            onClick={() => {
+              setQuery("")
+              // The button unmounts as soon as the query is empty, so focus
+              // has to go back to the input or it falls to <body> and the
+              // panel closes. Clearing should leave you ready to retype.
+              inputRef.current?.focus()
+            }}
             aria-label="Clear search"
             className="grid size-6 shrink-0 place-items-center rounded-full bg-tint-white text-foreground"
           >
@@ -137,7 +162,7 @@ export function Search({
                 </span>
               </div>
 
-              <Command.List className="flex max-h-85.5 flex-col gap-0.5 overflow-y-auto">
+              <Command.List className="scrollbar-thin flex max-h-85.5 flex-col gap-0.5 overflow-y-auto">
                 {results.map((result) => (
                   <Command.Item
                     key={result.id}
