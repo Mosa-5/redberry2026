@@ -1,5 +1,5 @@
 import { httpClient } from "../index";
-import type { Movie } from "../types";
+import type { Movie, MovieDetail } from "../types";
 
 /** Header typeahead. Returns at most 6 matches; a blank query returns []. */
 export const searchMovies = async (name:string):Promise<Movie[]>  => {
@@ -7,7 +7,7 @@ export const searchMovies = async (name:string):Promise<Movie[]>  => {
     const movies = await httpClient.get<{ data: Movie[] }>("/search", {
     params: { q: name },
   })
-  
+
    return movies.data.data;
     } catch (error) {
         console.error("Error searching for movies:", error);
@@ -15,51 +15,63 @@ export const searchMovies = async (name:string):Promise<Movie[]>  => {
     }
 }
 
-// {
-//   "data": [
-//     {
-//       "id": 23,
-//       "slug": "buddy-1514026",
-//       "title": "Buddy",
-//       "kind": "film",
-//       "runtimeMinutes": 95,
-//       "posterUrl": "https://image.tmdb.org/t/p/w500/szMG36D2cIxeQ7i5zRQbq0DnNDe.jpg",
-//       "backdropUrl": "https://image.tmdb.org/t/p/w1280/ytoLEl5yDaxB8AtZ52uKWjaQ9ql.jpg",
-//       "releaseDate": "2026-08-27",
-//       "isComingSoon": false,
-//       "isNotified": false,
-//       "isFeatured": false,
-//       "fromPrice": 12,
-//       "ageRating": {
-//         "code": "16+",
-//         "minAge": 16,
-//         "description": "Restricted to viewers aged 16 and over. Child tickets are unavailable."
-//       },
-//       "genres": [
-//         {
-//           "id": 4,
-//           "slug": "horror",
-//           "name": "Horror"
-//         },
-//         {
-//           "id": 6,
-//           "slug": "comedy",
-//           "name": "Comedy"
-//         },
-//         {
-//           "id": 12,
-//           "slug": "fantasy",
-//           "name": "Fantasy"
-//         }
-//       ],
-//       "formats": [
-//         {
-//           "id": 4,
-//           "slug": "panorama",
-//           "name": "PANORAMA",
-//           "priceUplift": 5
-//         }
-//       ]
-//     }
-//   ]
-// }
+
+export const featuredMovies = async ():Promise<Movie[]>  => {
+    try{
+    const movies = await httpClient.get<{ data: Movie[] }>("/movies/featured")
+  
+   return movies.data.data;
+    } catch (error) {
+        console.error("Error fetching featured movies:", error);
+        throw error;
+    }
+}
+
+
+/** One film with everything the details page shows. Keyed by slug. */
+/** Films currently on release. `limit` caps the list for the home row. */
+export const nowPlayingMovies = async (limit?: number): Promise<Movie[]> => {
+  try {
+    const movies = await httpClient.get<{ data: Movie[] }>("/movies/now-playing", {
+      params: { limit },
+    })
+    return movies.data.data
+  } catch (error) {
+    console.error("Error fetching now playing movies:", error)
+    throw error
+  }
+}
+
+/** Unreleased films. These have no sessions — offer Notify Me, not tickets. */
+export const comingSoonMovies = async (limit?: number): Promise<Movie[]> => {
+  try {
+    const movies = await httpClient.get<{ data: Movie[] }>("/movies/coming-soon", {
+      params: { limit },
+    })
+    return movies.data.data
+  } catch (error) {
+    console.error("Error fetching coming soon movies:", error)
+    throw error
+  }
+}
+
+export const movieDetail = async (slug: string): Promise<MovieDetail> => {
+  try {
+    const movie = await httpClient.get<{ data: MovieDetail }>(`/movies/${slug}`)
+    return movie.data.data
+  } catch (error) {
+    console.error("Error fetching movie detail:", error)
+    throw error
+  }
+}
+
+
+/**
+ * Featured titles with their synopsis, for the hero. /movies/featured returns
+ * Movie, which has no synopsis, so each one is followed up with its detail
+ * call — one request plus one per featured title, fetched in parallel.
+ */
+export const featuredMoviesDetailed = async (): Promise<MovieDetail[]> => {
+  const featured = await featuredMovies()
+  return Promise.all(featured.map((movie) => movieDetail(movie.slug)))
+}

@@ -45,3 +45,11 @@ export type Movie = {
   /** Present in live responses but absent from the published schema. */
   isNotified?: boolean
 }
+
+export type MovieDetail = Movie & {
+  synopsis: string
+  director: string | null
+  cast: string | null
+  /** Dates with at least one upcoming session, for the day picker. */
+  availableDates: string[]
+}

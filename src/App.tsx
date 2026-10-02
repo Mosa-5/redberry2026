@@ -1,4 +1,5 @@
 
+import Home from "./pages/Home"
 import DashboardLayout from "./layouts/dashboardLayout"
 
 
@@ -6,7 +7,9 @@ function App() {
   
 
   return (
-    <DashboardLayout><></></DashboardLayout>
+    <DashboardLayout>
+      <Home />
+    </DashboardLayout>
   )
 }
 

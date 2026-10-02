@@ -3,7 +3,9 @@ import { Command } from "cmdk"
 import { cn } from "cn"
 
 import { searchMovies } from "@/API/requests/Catalogue"
-import { Close, MagnifyingGlass, Popcorn } from "@/components/icons"
+import Close from "@/assets/icons/close.svg?react"
+import MagnifyingGlass from "@/assets/icons/magnifying-glass.svg?react"
+import Popcorn from "@/assets/icons/popcorn.svg?react"
 import { Button } from "@/components/ui/button"
 
 export type SearchResult = {
@@ -30,7 +32,7 @@ type SearchProps = {
  * cmdk drives the keyboard behaviour — arrow keys move the selection, Enter
  * fires onSelect. Filtering is off because the server returns the matches.
  */
-export function Search({ onSelect, className }: SearchProps) {
+export const Search = ({ onSelect, className }: SearchProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState("")
@@ -200,7 +202,7 @@ export function Search({ onSelect, className }: SearchProps) {
   )
 }
 
-function EmptyState({
+const EmptyState = ({
   icon,
   title,
   body,
@@ -208,7 +210,7 @@ function EmptyState({
   icon: React.ReactNode
   title: string
   body: string
-}) {
+}) => {
   return (
     <div className="flex flex-col items-center gap-1.5 px-6 pt-8 pb-7">
       <span className="grid size-12 place-items-center rounded-full bg-tint-white text-foreground">
@@ -228,7 +230,7 @@ function EmptyState({
 }
 
 /** Renders the part of the title matching the query in the primary colour. */
-function highlight(title: string, query: string) {
+const highlight = (title: string, query: string) => {
   const at = title.toLowerCase().indexOf(query.toLowerCase())
   if (!query || at < 0) return title
 
