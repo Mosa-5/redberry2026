@@ -239,5 +239,8 @@
     }
   html {
     @apply font-sans;
+    /* The Figma frames are 1728 wide but the brief is tested at 1920.
+       1920/1728 scales every rem-based size to match. */
+    font-size: 111.11%;
     }
 }

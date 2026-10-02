@@ -9,13 +9,13 @@ const Header = () =>{
                 <span className="text-foreground">KINO</span>
                 <span className="text-primary">XII</span>
             </a>
-            <h4 className="type-body-s">Sessions</h4>
+            <a href="/sessions" className="type-overline uppercase text-foreground">Sessions</a>
         </div>
         <div className="flex gap-8 items-center">
             <Search />
             <div className="flex gap-3">
-            <Button className="px-5.5 py-3.5 h-10.25">Sign up</Button>
-            <Button variant="secondary" className="px-5.5 py-3.5 h-10.25">Log in</Button>
+            <Button>Sign up</Button>
+            <Button variant="secondary">Log in</Button>
             </div>
         </div>
     </div>)

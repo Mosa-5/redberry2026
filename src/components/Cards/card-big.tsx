@@ -32,7 +32,7 @@ export const CardBig = ({ movie, synopsis, className }: CardBigProps) => {
             <img
               src={movie.posterUrl ?? ""}
               alt=""
-              className="size-full rounded-[14px] object-cover"
+              className="size-full rounded-[0.875rem] object-cover"
             />
           </div>
 
