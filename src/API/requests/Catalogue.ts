@@ -64,14 +64,3 @@ export const movieDetail = async (slug: string): Promise<MovieDetail> => {
     throw error
   }
 }
-
-
-/**
- * Featured titles with their synopsis, for the hero. /movies/featured returns
- * Movie, which has no synopsis, so each one is followed up with its detail
- * call — one request plus one per featured title, fetched in parallel.
- */
-export const featuredMoviesDetailed = async (): Promise<MovieDetail[]> => {
-  const featured = await featuredMovies()
-  return Promise.all(featured.map((movie) => movieDetail(movie.slug)))
-}

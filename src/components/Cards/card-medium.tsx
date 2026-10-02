@@ -33,7 +33,7 @@ export const CardMedium = ({
         className
       )}
     >
-      <div className="flex h-full flex-1 items-center">
+      <div className="flex h-full flex-1 items-center max-w-[229px]">
         <img
           src={movie.posterUrl ?? ""}
           alt=""
@@ -41,14 +41,14 @@ export const CardMedium = ({
         />
       </div>
 
-      <div className="flex h-33 shrink-0 flex-col items-start justify-between">
-        <div className="flex flex-col items-start gap-2">
+      <div className="flex w-full max-w-[202px] h-full shrink-0 flex-col items-start justify-between">
+        <div className="flex flex-col items-start gap-1.75">
           <p className="type-label-s text-primary">
             {releaseLabel(movie.releaseDate)}
           </p>
           <div className="flex flex-col items-start gap-2 whitespace-nowrap">
-            <p className="type-h3 text-foreground">{movie.title}</p>
-            <p className="type-body-m text-muted-foreground">
+            <p className="type-label-s text-foreground">{movie.title}</p>
+            <p className="type-body-s text-muted-foreground">
               {movie.genres[0]?.name} · {movie.runtimeMinutes} min
             </p>
           </div>

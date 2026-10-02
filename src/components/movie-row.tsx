@@ -1,6 +1,12 @@
-import { Children } from "react"
+import { Children, useEffect, useState } from "react"
+import { cn } from "cn"
 
-import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel"
+import {
+  type CarouselApi,
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel"
 
 type MovieRowProps = {
   /** Gap between cards, in px. Now Playing uses 17, Coming Soon 20. */
@@ -19,11 +25,30 @@ type MovieRowProps = {
  * would not give a mouse user.
  */
 export const MovieRow = ({ gap = 20, children, className }: MovieRowProps) => {
+  const [api, setApi] = useState<CarouselApi>()
+  const [dragging, setDragging] = useState(false)
+
+  // Dragging across cards would otherwise select their text. Embla has no
+  // option for this, but it reports the pointer, so selection is only
+  // disabled for the length of the drag rather than permanently.
+  useEffect(() => {
+    if (!api) return
+    const down = () => setDragging(true)
+    const up = () => setDragging(false)
+    api.on("pointerDown", down).on("pointerUp", up)
+    return () => {
+      api.off("pointerDown", down).off("pointerUp", up)
+    }
+  }, [api])
+
   return (
-    <Carousel opts={{ align: "start" }} className={className}>
+    <Carousel setApi={setApi} opts={{ align: "start" }} className={className}>
       {/* ml-0 drops shadcn's negative-margin gutter; the gap is explicit
           because the two rows use different values. */}
-      <CarouselContent className="ml-0" style={{ gap }}>
+      <CarouselContent
+        className={cn("ml-0", dragging && "select-none")}
+        style={{ gap }}
+      >
         {Children.map(children, (child) => (
           <CarouselItem className="basis-auto pl-0">{child}</CarouselItem>
         ))}

@@ -5,10 +5,7 @@ import { Button } from "@/components/ui/button"
 
 type CardBigProps = {
   movie: Movie
-  /**
-   * Revealed on hover. /movies/now-playing returns Movie, which has no
-   * synopsis — pass it from a detail call if the expanded state is wanted.
-   */
+  /** Revealed on hover. Absent on coming-soon titles, which omit it. */
   synopsis?: string
   className?: string
 }
@@ -24,14 +21,14 @@ export const CardBig = ({ movie, synopsis, className }: CardBigProps) => {
     <a
       href={`/movies/${movie.slug}`}
       className={cn(
-        "group/card flex h-113 w-65 flex-col items-center justify-center rounded-xl border border-transparent bg-card p-3.5 shadow-card",
-        "transition-all duration-300 hover:w-111.75 hover:border-raised",
+        "group/card flex h-113 w-65 flex-col rounded-xl border border-transparent bg-card p-3.5 shadow-card",
+        "transition-all duration-500 hover:w-111.75 hover:border-raised",
         className
       )}
     >
-      <div className="flex w-full flex-col gap-3">
-        <div className="flex min-h-0 flex-1 flex-col gap-3">
-          <div className="flex min-h-0 flex-1 items-center">
+      <div className="flex min-h-0 w-full flex-1 flex-col gap-3">
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="flex min-h-0 shrink basis-75 grow-0 items-center mb-3">
             <img
               src={movie.posterUrl ?? ""}
               alt=""
@@ -39,7 +36,7 @@ export const CardBig = ({ movie, synopsis, className }: CardBigProps) => {
             />
           </div>
 
-          <div className="flex w-full flex-col items-start gap-2">
+          <div className="flex w-full shrink-0 flex-col items-start gap-2 group-hover/card:mb-3 transition-all duration-500">
             <p className="type-h2 w-full text-foreground">{movie.title}</p>
             <p className="type-body-m whitespace-nowrap text-muted-foreground">
               {movie.genres[0]?.name} · {movie.runtimeMinutes} min
@@ -50,9 +47,11 @@ export const CardBig = ({ movie, synopsis, className }: CardBigProps) => {
           </div>
 
           {synopsis && (
-            <p className="type-body-m hidden pr-5 text-muted-foreground group-hover/card:block">
-              {synopsis}
-            </p>
+            <div className="grid shrink-0 grid-rows-[0fr] transition-[grid-template-rows] duration-500 group-hover/card:grid-rows-[1fr]">
+              <p className="type-body-m line-clamp-3 overflow-hidden pr-5 text-muted-foreground">
+                {synopsis}
+              </p>
+            </div>
           )}
         </div>
 

@@ -3,8 +3,8 @@ import Autoplay from "embla-carousel-autoplay"
 import Fade from "embla-carousel-fade"
 import { cn } from "cn"
 
-import { featuredMoviesDetailed } from "@/API/requests/Catalogue"
-import type { MovieDetail } from "@/API/types"
+import { featuredMovies } from "@/API/requests/Catalogue"
+import type { Movie } from "@/API/types"
 import ArrowLeft from "@/assets/icons/arrow-left.svg?react"
 import { HeroSlide } from "@/components/Hero/hero-slide"
 import {
@@ -25,11 +25,11 @@ type HeroCarouselProps = {
  * while the slides move.
  */
 export const HeroCarousel = ({ className }: HeroCarouselProps) => {
-  const [movies, setMovies] = useState<MovieDetail[]>([])
+  const [movies, setMovies] = useState<Movie[]>([])
 
   useEffect(() => {
     let ignore = false
-    featuredMoviesDetailed().then((movies) => {
+    featuredMovies().then((movies) => {
       if (!ignore) setMovies(movies)
     })
     return () => {

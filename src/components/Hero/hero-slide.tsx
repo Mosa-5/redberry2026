@@ -1,13 +1,13 @@
 import { cn } from "cn"
 
-import type { MovieDetail } from "@/API/types"
+import type { Movie } from "@/API/types"
 import Ticket from "@/assets/icons/ticket.svg?react"
 import Timer from "@/assets/icons/timer.svg?react"
 import { Button } from "@/components/ui/button"
 import { premiereLabel } from "@/lib/format"
 
 type HeroSlideProps = {
-  movie: MovieDetail
+  movie: Movie
   /** Whether this is the slide currently on screen. */
   active: boolean
 }

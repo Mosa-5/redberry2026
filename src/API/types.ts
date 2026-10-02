@@ -44,6 +44,8 @@ export type Movie = {
   formats: Format[]
   /** Present in live responses but absent from the published schema. */
   isNotified?: boolean
+  /** Returned by /movies/featured and /movies/now-playing, not coming-soon. */
+  synopsis?: string
 }
 
 export type MovieDetail = Movie & {
