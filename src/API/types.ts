@@ -55,3 +55,44 @@ export type MovieDetail = Movie & {
   /** Dates with at least one upcoming session, for the day picker. */
   availableDates: string[]
 }
+
+export type Venue = {
+  id: number
+  /** Value for the `venues[]` sessions filter. */
+  slug: string
+  name: string
+  city: string
+  /** Formats this venue can show — narrows the format filter. */
+  formats: Format[]
+}
+
+export type User = {
+  id: number
+  username: string
+  email: string
+  /** Public URL, or null. */
+  avatar: string | null
+  fullName: string | null
+  mobileNumber: string | null
+  dateOfBirth: string | null
+  /** Derived from dateOfBirth for the age gate; null until the profile is complete. */
+  age: number | null
+  preferredVenue: Venue | null
+  /** False until fullName, mobileNumber and dateOfBirth are set. Booking is blocked while false. */
+  profileComplete: boolean
+}
+
+/** What /login and /register return: the user plus a Bearer token. */
+export type AuthSession = {
+  user: User
+  token: string
+}
+
+/**
+ * Error body. `errors` present means field validation (map onto inputs);
+ * absent means a rule or auth failure, and `message` is written for the user.
+ */
+export type ApiError = {
+  message: string
+  errors?: Record<string, string[]>
+}

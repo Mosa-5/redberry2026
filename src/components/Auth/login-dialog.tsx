@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import type { AxiosError } from "axios"
 import { useForm } from "react-hook-form"
 
+import type { ApiError } from "@/API/types"
 import { SwitchPrompt } from "@/components/Auth/switch-prompt"
 import { loginSchema, type LoginValues } from "@/components/Auth/auth-schemas"
 import { FormField } from "@/components/form-field"
@@ -12,16 +14,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { applyServerErrors } from "@/lib/form-errors"
+import { useLogin } from "@/reactQuery/mutations/auth"
 
 type LoginFormProps = {
-  onSubmit?: (values: LoginValues) => Promise<void>
+  /** Called once signed in — the parent closes the dialog. */
+  onSuccess: () => void
   onSwitchToRegister: () => void
 }
 
-const LoginForm = ({ onSubmit, onSwitchToRegister }: LoginFormProps) => {
+const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => {
+  const { mutateAsync: login } = useLogin()
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, touchedFields, isValid, isSubmitting },
   } = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -30,10 +37,21 @@ const LoginForm = ({ onSubmit, onSwitchToRegister }: LoginFormProps) => {
     defaultValues: { email: "", password: "" },
   })
 
+  const onSubmit = async (values: LoginValues) => {
+    try {
+      await login(values)
+      onSuccess()
+    } catch (error) {
+      // A 401 here is wrong credentials: its message shows in the modal,
+      // which stays open with the email still filled in.
+      applyServerErrors(error as AxiosError<ApiError>, setError, ["email", "password"])
+    }
+  }
+
   return (
     <form
       noValidate
-      onSubmit={handleSubmit(async (values) => onSubmit?.(values))}
+      onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col gap-8"
     >
       <div className="flex flex-col gap-6">
@@ -58,8 +76,13 @@ const LoginForm = ({ onSubmit, onSwitchToRegister }: LoginFormProps) => {
       </div>
 
       <div className="flex flex-col items-center gap-6">
+        {errors.root?.server && (
+          <p role="alert" className="type-label-s text-primary">
+            {errors.root.server.message}
+          </p>
+        )}
         <Button type="submit" className="w-full" disabled={!isValid || isSubmitting}>
-          Log in
+          {isSubmitting ? "Logging in…" : "Log in"}
         </Button>
         <SwitchPrompt text="Don't have an account?" action="Sign up" onClick={onSwitchToRegister} />
       </div>

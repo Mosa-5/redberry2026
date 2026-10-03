@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
+import type { AxiosError } from "axios"
 import { cn } from "cn"
 import { useForm } from "react-hook-form"
 
+import type { ApiError } from "@/API/types"
 import Upload from "@/assets/icons/upload.svg?react"
 import { SwitchPrompt } from "@/components/Auth/switch-prompt"
 import { AVATAR_TYPES, registerSchema, type RegisterValues } from "@/components/Auth/auth-schemas"
@@ -15,6 +17,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { applyServerErrors } from "@/lib/form-errors"
+import { useRegister } from "@/reactQuery/mutations/auth"
 
 type AvatarFieldProps = {
   error?: string
@@ -66,15 +70,18 @@ const AvatarField = ({ error, onSelect }: AvatarFieldProps) => {
 }
 
 type RegisterFormProps = {
-  onSubmit?: (values: RegisterValues) => Promise<void>
+  /** Called once the account exists — registering also signs in. */
+  onSuccess: () => void
   onSwitchToLogin: () => void
 }
 
-const RegisterForm = ({ onSubmit, onSwitchToLogin }: RegisterFormProps) => {
+const RegisterForm = ({ onSuccess, onSwitchToLogin }: RegisterFormProps) => {
+  const { mutateAsync: signUp } = useRegister()
   const {
     register,
     handleSubmit,
     setValue,
+    setError,
     formState: { errors, touchedFields, isValid, isSubmitting },
   } = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
@@ -82,12 +89,28 @@ const RegisterForm = ({ onSubmit, onSwitchToLogin }: RegisterFormProps) => {
     defaultValues: { username: "", email: "", password: "", confirmPassword: "" },
   })
 
+  const onSubmit = async ({ confirmPassword, ...values }: RegisterValues) => {
+    try {
+      await signUp({ ...values, passwordConfirmation: confirmPassword })
+      onSuccess()
+    } catch (error) {
+      // "Already taken" for username or email arrives as a 422 and lands on
+      // that field, as the brief requires.
+      applyServerErrors(
+        error as AxiosError<ApiError>,
+        setError,
+        ["avatar", "username", "email", "password", "confirmPassword"],
+        { password_confirmation: "confirmPassword" }
+      )
+    }
+  }
+
   const succeeded = (field: keyof RegisterValues) => !!touchedFields[field] && !errors[field]
 
   return (
     <form
       noValidate
-      onSubmit={handleSubmit(async (values) => onSubmit?.(values))}
+      onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col gap-8"
     >
       <AvatarField
@@ -137,8 +160,13 @@ const RegisterForm = ({ onSubmit, onSwitchToLogin }: RegisterFormProps) => {
       </div>
 
       <div className="flex flex-col items-center gap-6">
+        {errors.root?.server && (
+          <p role="alert" className="type-label-s text-primary">
+            {errors.root.server.message}
+          </p>
+        )}
         <Button type="submit" className="w-full" disabled={!isValid || isSubmitting}>
-          Sign up
+          {isSubmitting ? "Signing up…" : "Sign up"}
         </Button>
         <SwitchPrompt text="Already have an account?" action="Log in" onClick={onSwitchToLogin} />
       </div>
