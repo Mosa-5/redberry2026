@@ -1,12 +1,15 @@
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
+import { keepPreviousData } from "@tanstack/react-query"
 import { Command } from "cmdk"
 import { cn } from "cn"
 
-import { searchMovies } from "@/API/requests/Catalogue"
+import type { Movie } from "@/API/types"
 import Close from "@/assets/icons/close.svg?react"
 import MagnifyingGlass from "@/assets/icons/magnifying-glass.svg?react"
 import Popcorn from "@/assets/icons/popcorn.svg?react"
 import { Button } from "@/components/ui/button"
+import { useDebounce } from "@/hooks/use-debounce"
+import { useGetSearch } from "@/reactQuery/query/catalogue"
 
 export type SearchResult = {
   id: string
@@ -36,33 +39,18 @@ export const Search = ({ onSelect, className }: SearchProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState("")
-  const [results, setResults] = useState<SearchResult[]>([])
   const hasQuery = query.length > 0
   const expanded = open || hasQuery
   const showIcon = !(open && !hasQuery)
 
-  useEffect(() => {
-    // `ignore` drops responses that land after a newer query has been typed,
-    // which would otherwise show stale results. TanStack Query will take this
-    // over, along with debouncing and caching.
-    let ignore = false
-    searchMovies(query).then((movies) => {
-      if (ignore) return
-      setResults(
-        movies.map((movie) => ({
-          id: movie.id.toString(),
-          title: movie.title,
-          meta: `${movie.kind} · ${movie.ageRating.code} · ${movie.runtimeMinutes} min`,
-          poster: movie.posterUrl || "",
-          price: movie.fromPrice ? `from ₾${movie.fromPrice}` : undefined,
-          comingSoon: movie.isComingSoon,
-        }))
-      )
-    })
-    return () => {
-      ignore = true
-    }
-  }, [query])
+  // The /search docs ask for a debounce. Keeping the previous results on
+  // screen while the next query loads stops the panel flashing "No results"
+  // between keystrokes.
+  const debouncedQuery = useDebounce(query, 300)
+  const { data: results } = useGetSearch(
+    { queryOptions: { select: toSearchResults, placeholderData: keepPreviousData } },
+    debouncedQuery
+  )
 
   return (
     <Command
@@ -147,7 +135,9 @@ export const Search = ({ onSelect, className }: SearchProps) => {
             />
           )}
 
-          {hasQuery && results.length === 0 && (
+          {/* undefined means the first request hasn't answered yet — not
+              the same as an empty answer. */}
+          {hasQuery && results?.length === 0 && (
             <EmptyState
               icon={<MagnifyingGlass className="size-5" />}
               title={`No results for “${query}”`}
@@ -155,7 +145,7 @@ export const Search = ({ onSelect, className }: SearchProps) => {
             />
           )}
 
-          {hasQuery && results.length > 0 && (
+          {hasQuery && results && results.length > 0 && (
             <>
               <div className="flex items-start justify-between px-2.5 pt-2 pb-1.5 text-muted-foreground">
                 <span className="type-overline uppercase">Films &amp; Events</span>
@@ -201,6 +191,18 @@ export const Search = ({ onSelect, className }: SearchProps) => {
     </Command>
   )
 }
+
+// Module-level so the reference is stable; React Query reruns `select`
+// whenever it receives a new function.
+const toSearchResults = (movies: Movie[]): SearchResult[] =>
+  movies.map((movie) => ({
+    id: movie.id.toString(),
+    title: movie.title,
+    meta: `${movie.kind} · ${movie.ageRating.code} · ${movie.runtimeMinutes} min`,
+    poster: movie.posterUrl || "",
+    price: movie.fromPrice ? `from ₾${movie.fromPrice}` : undefined,
+    comingSoon: movie.isComingSoon,
+  }))
 
 const EmptyState = ({
   icon,

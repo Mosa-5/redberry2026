@@ -1,9 +1,6 @@
-import { useEffect, useState } from "react"
-
-import { nowPlayingMovies } from "@/API/requests/Catalogue"
-import type { Movie } from "@/API/types"
 import { CardBig } from "@/components/Cards/card-big"
 import { MovieRow } from "@/components/movie-row"
+import { useGetNowPlayingMovies } from "@/reactQuery/query/catalogue"
 
 type NowPlayingProps = {
   /** Caps how many titles the API returns. Omit for the whole catalogue. */
@@ -12,17 +9,7 @@ type NowPlayingProps = {
 
 /** "NOW PLAYING" on the home page (Figma 139:3024). */
 export const NowPlaying = ({ limit }: NowPlayingProps) => {
-  const [movies, setMovies] = useState<Movie[]>([])
-
-  useEffect(() => {
-    let ignore = false
-    nowPlayingMovies(limit).then((movies) => {
-      if (!ignore) setMovies(movies)
-    })
-    return () => {
-      ignore = true
-    }
-  }, [limit])
+  const { data: movies = [] } = useGetNowPlayingMovies({}, limit)
 
   return (
     <section className="flex flex-col gap-6 px-17.5">

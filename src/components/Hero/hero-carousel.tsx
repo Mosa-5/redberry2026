@@ -1,10 +1,8 @@
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react"
+import { useCallback, useState, useSyncExternalStore } from "react"
 import Autoplay from "embla-carousel-autoplay"
 import Fade from "embla-carousel-fade"
 import { cn } from "cn"
 
-import { featuredMovies } from "@/API/requests/Catalogue"
-import type { Movie } from "@/API/types"
 import ArrowLeft from "@/assets/icons/arrow-left.svg?react"
 import { HeroSlide } from "@/components/Hero/hero-slide"
 import {
@@ -13,6 +11,7 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel"
+import { useGetFeaturedMovies } from "@/reactQuery/query/catalogue"
 
 type HeroCarouselProps = {
   className?: string
@@ -25,17 +24,7 @@ type HeroCarouselProps = {
  * while the slides move.
  */
 export const HeroCarousel = ({ className }: HeroCarouselProps) => {
-  const [movies, setMovies] = useState<Movie[]>([])
-
-  useEffect(() => {
-    let ignore = false
-    featuredMovies().then((movies) => {
-      if (!ignore) setMovies(movies)
-    })
-    return () => {
-      ignore = true
-    }
-  }, [])
+  const { data: movies = [] } = useGetFeaturedMovies()
 
   const [api, setApi] = useState<CarouselApi>()
   // One stable instance, so reset() always targets the plugin Embla is

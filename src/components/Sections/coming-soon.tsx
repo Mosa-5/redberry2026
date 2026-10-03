@@ -1,9 +1,6 @@
-import { useEffect, useState } from "react"
-
-import { comingSoonMovies } from "@/API/requests/Catalogue"
-import type { Movie } from "@/API/types"
 import { CardMedium } from "@/components/Cards/card-medium"
 import { MovieRow } from "@/components/movie-row"
+import { useGetComingSoonMovies } from "@/reactQuery/query/catalogue"
 
 type ComingSoonProps = {
   /** Caps how many titles the API returns. Omit for the whole catalogue. */
@@ -15,17 +12,7 @@ type ComingSoonProps = {
  * sessions, so each card offers Notify Me rather than a ticket link.
  */
 export const ComingSoon = ({ limit }: ComingSoonProps) => {
-  const [movies, setMovies] = useState<Movie[]>([])
-
-  useEffect(() => {
-    let ignore = false
-    comingSoonMovies(limit).then((movies) => {
-      if (!ignore) setMovies(movies)
-    })
-    return () => {
-      ignore = true
-    }
-  }, [limit])
+  const { data: movies = [] } = useGetComingSoonMovies({}, limit)
 
   return (
     <section className="flex flex-col gap-6 px-17.5">
