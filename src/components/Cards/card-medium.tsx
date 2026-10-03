@@ -3,6 +3,7 @@ import { cn } from "cn"
 import type { Movie } from "@/API/types"
 import Bell from "@/assets/icons/bell.svg?react"
 import Check from "@/assets/icons/check.svg?react"
+import { Skeleton } from "@/components/skeleton"
 import { Button } from "@/components/ui/button"
 import { releaseLabel } from "@/lib/format"
 
@@ -70,6 +71,24 @@ export const CardMedium = ({
           )}
           {notified ? "Reminder set" : "Notify Me"}
         </Button>
+      </div>
+    </div>
+  )
+}
+
+/** Loading stand-in with the card's footprint: poster on the left, text and button on the right. */
+export const CardMediumSkeleton = () => {
+  return (
+    <div className="flex h-40 w-117.5 items-center gap-4.5 rounded-xl bg-card p-3.5 shadow-card">
+      <Skeleton className="h-full max-w-57.25 flex-1 rounded-[0.875rem]" />
+      <div className="flex h-full w-50.5 shrink-0 flex-col items-start justify-between">
+        <div className="flex w-full flex-col gap-2">
+          <Skeleton className="h-3.5 w-3/4" />
+          <Skeleton className="h-3.5 w-1/2" />
+          <Skeleton className="h-3.5 w-2/5" />
+          <Skeleton className="h-5.5 w-10 rounded-full" />
+        </div>
+        <Skeleton className="h-7 w-24 rounded-full" />
       </div>
     </div>
   )

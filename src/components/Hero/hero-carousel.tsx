@@ -4,7 +4,11 @@ import Fade from "embla-carousel-fade"
 import { cn } from "cn"
 
 import ArrowLeft from "@/assets/icons/arrow-left.svg?react"
+import Popcorn from "@/assets/icons/popcorn.svg?react"
 import { HeroSlide } from "@/components/Hero/hero-slide"
+import { Skeleton } from "@/components/skeleton"
+import { ErrorMessage, StateMessage } from "@/components/state-message"
+import { Button } from "@/components/ui/button"
 import {
   type CarouselApi,
   Carousel,
@@ -17,6 +21,52 @@ type HeroCarouselProps = {
   className?: string
 }
 
+/** Keeps the hero's footprint while it has no slides, so the page doesn't jump. */
+const HeroFrame = ({ className, children }: { className?: string; children: React.ReactNode }) => {
+  return <div className={cn("relative h-190 w-full mb-8 bg-card", className)}>{children}</div>
+}
+
+/** Bars in the slide's layout: premiere badge, title, badges, synopsis, buttons, progress. */
+const HeroSkeleton = ({ className }: { className?: string }) => {
+  return (
+    <HeroFrame className={cn("flex items-end px-16.75 pb-42.25", className)}>
+      <div className="flex w-145 flex-col gap-3.75">
+        <Skeleton className="h-7.5 w-56 rounded-full" />
+        <div className="flex flex-col gap-5">
+          <Skeleton className="h-12 w-96" />
+          <div className="flex gap-2">
+            <Skeleton className="h-7.5 w-12 rounded-full" />
+            <Skeleton className="h-7.5 w-24 rounded-full" />
+            <Skeleton className="h-7.5 w-14 rounded-full" />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-4 w-140" />
+            <Skeleton className="h-4 w-140" />
+            <Skeleton className="h-4 w-80" />
+          </div>
+          <div className="flex gap-3">
+            <Skeleton className="h-11 w-36 rounded-full" />
+            <Skeleton className="h-11 w-32 rounded-full" />
+          </div>
+        </div>
+      </div>
+      {/* Same row as the real controls: the bars are centred against the
+          54px arrows, so the arrows have to be here for the bars to line up. */}
+      <div className="absolute inset-x-0 bottom-10.5 mx-auto flex w-full items-center gap-6 px-16.75">
+        <div className="flex flex-1 items-center gap-2">
+          {Array.from({ length: 4 }, (_, index) => (
+            <Skeleton key={index} className="h-0.75 flex-1 rounded-full" />
+          ))}
+        </div>
+        <div className="flex gap-3">
+          <Skeleton className="size-13.5 rounded-full" />
+          <Skeleton className="size-13.5 rounded-full" />
+        </div>
+      </div>
+    </HeroFrame>
+  )
+}
+
 /**
  * The home page hero (Figma Banners, 131:4477). One full-bleed slide per
  * featured title, with segmented progress bars and a pair of arrows pinned
@@ -24,7 +74,7 @@ type HeroCarouselProps = {
  * while the slides move.
  */
 export const HeroCarousel = ({ className }: HeroCarouselProps) => {
-  const { data: movies = [] } = useGetFeaturedMovies()
+  const { data: movies = [], isLoading, isError, refetch } = useGetFeaturedMovies()
 
   const [api, setApi] = useState<CarouselApi>()
   // One stable instance, so reset() always targets the plugin Embla is
@@ -62,7 +112,32 @@ export const HeroCarousel = ({ className }: HeroCarouselProps) => {
     [api, autoplay]
   )
 
-  if (movies.length === 0) return null
+  if (isLoading) return <HeroSkeleton className={className} />
+
+  if (isError) {
+    return (
+      <HeroFrame className={cn("grid place-items-center", className)}>
+        <ErrorMessage title="Couldn't load featured films" onRetry={() => refetch()} />
+      </HeroFrame>
+    )
+  }
+
+  if (movies.length === 0) {
+    return (
+      <HeroFrame className={cn("grid place-items-center", className)}>
+        <StateMessage
+          icon={<Popcorn className="size-6" />}
+          title="No featured films right now"
+          body="See everything that's showing in the meantime."
+          action={
+            <Button variant="transparent" asChild>
+              <a href="/sessions">Browse all sessions</a>
+            </Button>
+          }
+        />
+      </HeroFrame>
+    )
+  }
 
   return (
     <Carousel

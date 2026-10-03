@@ -7,6 +7,8 @@ import type { Movie } from "@/API/types"
 import Close from "@/assets/icons/close.svg?react"
 import MagnifyingGlass from "@/assets/icons/magnifying-glass.svg?react"
 import Popcorn from "@/assets/icons/popcorn.svg?react"
+import { Skeleton } from "@/components/skeleton"
+import { ErrorMessage, StateMessage } from "@/components/state-message"
 import { Button } from "@/components/ui/button"
 import { useDebounce } from "@/hooks/use-debounce"
 import { useGetSearch } from "@/reactQuery/query/catalogue"
@@ -47,7 +49,7 @@ export const Search = ({ onSelect, className }: SearchProps) => {
   // screen while the next query loads stops the panel flashing "No results"
   // between keystrokes.
   const debouncedQuery = useDebounce(query, 300)
-  const { data: results } = useGetSearch(
+  const { data: results, isError, refetch } = useGetSearch(
     { queryOptions: { select: toSearchResults, placeholderData: keepPreviousData } },
     debouncedQuery
   )
@@ -128,24 +130,39 @@ export const Search = ({ onSelect, className }: SearchProps) => {
           )}
         >
           {!hasQuery && (
-            <EmptyState
+            <StateMessage
               icon={<Popcorn className="size-6" />}
               title="What do you want to watch?"
               body="Search by title, director or cast"
+              action={browseAction}
+              className={panelMessage}
             />
           )}
 
-          {/* undefined means the first request hasn't answered yet — not
-              the same as an empty answer. */}
-          {hasQuery && results?.length === 0 && (
-            <EmptyState
+          {hasQuery && isError && (
+            <ErrorMessage
+              title="Search isn't working right now"
+              onRetry={() => refetch()}
+              className={panelMessage}
+            />
+          )}
+
+          {/* No results yet covers both the debounce wait and the first
+              request for a query. Later queries keep the previous results
+              on screen instead (keepPreviousData). */}
+          {hasQuery && !isError && !results && <SearchSkeleton />}
+
+          {hasQuery && !isError && results?.length === 0 && (
+            <StateMessage
               icon={<MagnifyingGlass className="size-5" />}
               title={`No results for “${query}”`}
               body="Check the spelling or try another film or live event."
+              action={browseAction}
+              className={panelMessage}
             />
           )}
 
-          {hasQuery && results && results.length > 0 && (
+          {hasQuery && !isError && results && results.length > 0 && (
             <>
               <div className="flex items-start justify-between px-2.5 pt-2 pb-1.5 text-muted-foreground">
                 <span className="type-overline uppercase">Films &amp; Events</span>
@@ -204,29 +221,28 @@ const toSearchResults = (movies: Movie[]): SearchResult[] =>
     comingSoon: movie.isComingSoon,
   }))
 
-const EmptyState = ({
-  icon,
-  title,
-  body,
-}: {
-  icon: React.ReactNode
-  title: string
-  body: string
-}) => {
+const panelMessage = "px-6 pt-8 pb-7"
+
+const browseAction = (
+  <Button variant="transparent" asChild>
+    <a href="/sessions">Browse all sessions</a>
+  </Button>
+)
+
+/** Three rows shaped like results: poster, title and meta lines, price. */
+const SearchSkeleton = () => {
   return (
-    <div className="flex flex-col items-center gap-1.5 px-6 pt-8 pb-7">
-      <span className="grid size-12 place-items-center rounded-full bg-tint-white text-foreground">
-        {icon}
-      </span>
-      <span className="h-2" />
-      <p className="type-label-m text-foreground">{title}</p>
-      <p className="w-95 text-center type-body-m text-muted-foreground">
-        {body}
-      </p>
-      <span className="h-2.5" />
-      <Button variant="transparent" asChild>
-        <a href="/sessions">Browse all sessions</a>
-      </Button>
+    <div aria-busy className="flex flex-col gap-0.5 pt-9">
+      {Array.from({ length: 3 }, (_, index) => (
+        <div key={index} className="flex h-18 items-center gap-3.5 py-2 pr-5 pl-2.5">
+          <Skeleton className="h-14 w-10 shrink-0 rounded-2xs" />
+          <div className="flex flex-1 flex-col gap-1.5">
+            <Skeleton className="h-3.5 w-1/2" />
+            <Skeleton className="h-3 w-1/3" />
+          </div>
+          <Skeleton className="h-3.5 w-14" />
+        </div>
+      ))}
     </div>
   )
 }

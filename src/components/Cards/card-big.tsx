@@ -1,6 +1,7 @@
 import { cn } from "cn"
 
 import type { Movie } from "@/API/types"
+import { Skeleton } from "@/components/skeleton"
 import { Button } from "@/components/ui/button"
 
 type CardBigProps = {
@@ -63,5 +64,23 @@ export const CardBig = ({ movie, synopsis, className }: CardBigProps) => {
         </div>
       </div>
     </a>
+  )
+}
+
+/** Loading stand-in with the resting card's footprint: poster, three text lines, price row. */
+export const CardBigSkeleton = () => {
+  return (
+    <div className="flex h-113 w-65 flex-col gap-3 rounded-xl bg-card p-3.5 shadow-card">
+      <Skeleton className="h-75 w-full shrink-0 rounded-[0.875rem]" />
+      <div className="flex flex-1 flex-col gap-2">
+        <Skeleton className="h-6 w-3/4" />
+        <Skeleton className="h-4 w-1/2" />
+        <Skeleton className="h-5.5 w-10 rounded-full" />
+      </div>
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-4 w-20" />
+        <Skeleton className="h-9.25 w-28 rounded-full" />
+      </div>
+    </div>
   )
 }
