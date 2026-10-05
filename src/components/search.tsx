@@ -1,3 +1,4 @@
+import { Link } from "react-router"
 import { useRef, useState } from "react"
 import { keepPreviousData } from "@tanstack/react-query"
 import { Command } from "cmdk"
@@ -15,6 +16,8 @@ import { useGetSearch } from "@/reactQuery/query/catalogue"
 
 export type SearchResult = {
   id: string
+  /** For the film page link. */
+  slug: string
   title: string
   /** e.g. "Film · 12+ · 134 min" */
   meta: string
@@ -214,6 +217,7 @@ export const Search = ({ onSelect, className }: SearchProps) => {
 const toSearchResults = (movies: Movie[]): SearchResult[] =>
   movies.map((movie) => ({
     id: movie.id.toString(),
+    slug: movie.slug,
     title: movie.title,
     meta: `${movie.kind} · ${movie.ageRating.code} · ${movie.runtimeMinutes} min`,
     poster: movie.posterUrl || "",
@@ -225,7 +229,7 @@ const panelMessage = "px-6 pt-8 pb-7"
 
 const browseAction = (
   <Button variant="transparent" asChild>
-    <a href="/sessions">Browse all sessions</a>
+    <Link to="/sessions">Browse all sessions</Link>
   </Button>
 )
 

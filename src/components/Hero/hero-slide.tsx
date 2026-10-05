@@ -1,3 +1,4 @@
+import { Link } from "react-router"
 import { cn } from "cn"
 
 import type { Movie } from "@/API/types"
@@ -63,13 +64,13 @@ export const HeroSlide = ({ movie, active }: HeroSlideProps) => {
 
           <div className="flex gap-3">
             <Button asChild>
-              <a href={`/movies/${movie.slug}`}>
+              <Link to={`/movies/${movie.slug}`}>
                 <Ticket className="size-4" />
                 Buy tickets
-              </a>
+              </Link>
             </Button>
             <Button variant="transparent" asChild>
-              <a href={`/movies/${movie.slug}`}>All sessions</a>
+              <Link to={`/movies/${movie.slug}`}>All sessions</Link>
             </Button>
           </div>
         </div>

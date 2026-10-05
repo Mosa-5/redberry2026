@@ -1,3 +1,4 @@
+import { Link } from "react-router"
 import { cn } from "cn"
 
 import type { Movie } from "@/API/types"
@@ -13,8 +14,8 @@ type CardSmallProps = {
  */
 export const CardSmall = ({ movie, className }: CardSmallProps) => {
   return (
-    <a
-      href={`/movies/${movie.slug}`}
+    <Link
+      to={`/movies/${movie.slug}`}
       className={cn(
         "flex h-21.75 w-82.25 items-center justify-center gap-3 rounded-lg bg-card p-2.5",
         "transition-shadow hover:shadow-[0_4px_12px_0_var(--shadow-color)]",
@@ -40,6 +41,6 @@ export const CardSmall = ({ movie, className }: CardSmallProps) => {
           {movie.ageRating.code}
         </span>
       </span>
-    </a>
+    </Link>
   )
 }

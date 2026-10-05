@@ -1,3 +1,4 @@
+import { Link } from "react-router"
 import { useCallback, useState, useSyncExternalStore } from "react"
 import Autoplay from "embla-carousel-autoplay"
 import Fade from "embla-carousel-fade"
@@ -131,7 +132,7 @@ export const HeroCarousel = ({ className }: HeroCarouselProps) => {
           body="See everything that's showing in the meantime."
           action={
             <Button variant="transparent" asChild>
-              <a href="/sessions">Browse all sessions</a>
+              <Link to="/sessions">Browse all sessions</Link>
             </Button>
           }
         />

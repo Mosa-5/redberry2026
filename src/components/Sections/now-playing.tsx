@@ -1,3 +1,5 @@
+import { Link } from "react-router"
+
 import Popcorn from "@/assets/icons/popcorn.svg?react"
 import { CardBig, CardBigSkeleton } from "@/components/Cards/card-big"
 import { MovieRow } from "@/components/movie-row"
@@ -17,9 +19,9 @@ export const NowPlaying = ({ limit }: NowPlayingProps) => {
     <section className="flex flex-col gap-6 px-17.5" aria-busy={isLoading}>
       <div className="flex items-end justify-between">
         <h2 className="type-h1 text-foreground">NOW PLAYING</h2>
-        <a href="/sessions" className="type-label-m text-primary">
+        <Link to="/sessions" className="type-label-m text-primary">
           See all
-        </a>
+        </Link>
       </div>
 
       {isLoading ? (

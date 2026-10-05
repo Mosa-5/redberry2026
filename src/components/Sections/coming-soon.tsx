@@ -1,3 +1,5 @@
+import { Link } from "react-router"
+
 import Bell from "@/assets/icons/bell.svg?react"
 import { CardMedium, CardMediumSkeleton } from "@/components/Cards/card-medium"
 import { MovieRow } from "@/components/movie-row"
@@ -20,9 +22,9 @@ export const ComingSoon = ({ limit }: ComingSoonProps) => {
     <section className="flex flex-col gap-6 px-17.5" aria-busy={isLoading}>
       <div className="flex items-end justify-between">
         <h2 className="type-h1 text-foreground">COMING SOON...</h2>
-        <a href="/sessions" className="type-label-m text-primary">
+        <Link to="/sessions" className="type-label-m text-primary">
           See all
-        </a>
+        </Link>
       </div>
 
       {isLoading ? (

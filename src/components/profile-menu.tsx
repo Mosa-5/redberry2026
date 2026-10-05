@@ -1,5 +1,6 @@
 import { cn } from "cn"
 import { DropdownMenu } from "radix-ui"
+import { Link, useMatch, useNavigate } from "react-router"
 
 import type { User } from "@/API/types"
 import Check from "@/assets/icons/check.svg?react"
@@ -43,6 +44,8 @@ const ProfileStatus = ({ complete }: { complete: boolean }) => {
  */
 export const ProfileMenu = ({ user }: { user: User }) => {
   const logout = useLogout()
+  const navigate = useNavigate()
+  const onProfile = useMatch("/profile/*")
   const firstName = user.fullName?.split(/\s+/)[0] ?? user.username
 
   return (
@@ -81,19 +84,18 @@ export const ProfileMenu = ({ user }: { user: User }) => {
 
           <div className="flex flex-col gap-1">
             <div className="flex flex-col gap-0.5 pt-1">
-              {/* TODO: point at the real routes once the profile page and
-                  React Router exist. */}
               <DropdownMenu.Item asChild>
-                <a href="/profile" className={cn(itemClass, "h-10 text-foreground")}>
+                <Link to="/profile" className={cn(itemClass, "h-10 text-foreground")}>
                   <UserIcon className="size-4" />
                   My Profile
-                </a>
+                </Link>
               </DropdownMenu.Item>
+              {/* TODO: open the tickets section once the profile page has it. */}
               <DropdownMenu.Item asChild>
-                <a href="/profile/tickets" className={cn(itemClass, "h-10 text-foreground")}>
+                <Link to="/profile" className={cn(itemClass, "h-10 text-foreground")}>
                   <Ticket className="size-4" />
                   My Tickets
-                </a>
+                </Link>
               </DropdownMenu.Item>
             </div>
             <DropdownMenu.Separator className="h-px bg-tint-white" />
@@ -102,7 +104,12 @@ export const ProfileMenu = ({ user }: { user: User }) => {
               // padding makes it 36px.
               className={cn(itemClass, "py-2.5 text-primary")}
               disabled={logout.isPending}
-              onSelect={() => logout.mutate()}
+              onSelect={() => {
+                // Leave signed-in pages first, or their guard would read the
+                // cleared token as an expired session and open the login modal.
+                if (onProfile) navigate("/")
+                logout.mutate()
+              }}
             >
               <Logout className="size-4" />
               Log out

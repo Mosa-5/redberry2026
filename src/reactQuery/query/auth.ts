@@ -1,10 +1,9 @@
-import { useSyncExternalStore } from "react"
 import { skipToken, useQuery, type UseQueryResult } from "@tanstack/react-query"
 import type { AxiosError } from "axios"
 
 import { me } from "@/API/requests/Auth"
-import { getToken, subscribeToken } from "@/API/token"
 import type { User } from "@/API/types"
+import { useToken } from "@/hooks/use-token"
 import type { HookOptions } from "@/reactQuery/types"
 
 /**
@@ -17,7 +16,7 @@ import type { HookOptions } from "@/reactQuery/types"
 export const useGetMe = <T = User>(
   { queryOptions }: HookOptions<User, T> = {}
 ): UseQueryResult<T, AxiosError> => {
-  const token = useSyncExternalStore(subscribeToken, getToken)
+  const token = useToken()
 
   return useQuery<User, AxiosError, T>({
     queryKey: ["me", token],

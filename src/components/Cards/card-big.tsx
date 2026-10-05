@@ -1,3 +1,4 @@
+import { Link } from "react-router"
 import { cn } from "cn"
 
 import type { Movie } from "@/API/types"
@@ -19,8 +20,8 @@ type CardBigProps = {
  */
 export const CardBig = ({ movie, synopsis, className }: CardBigProps) => {
   return (
-    <a
-      href={`/movies/${movie.slug}`}
+    <Link
+      to={`/movies/${movie.slug}`}
       className={cn(
         "group/card flex h-113 w-65 flex-col rounded-xl border border-transparent bg-card p-3.5 shadow-card",
         "transition-all duration-500 hover:w-111.75 hover:border-raised",
@@ -63,7 +64,7 @@ export const CardBig = ({ movie, synopsis, className }: CardBigProps) => {
           <Button className="py-2.5">Buy Ticket</Button>
         </div>
       </div>
-    </a>
+    </Link>
   )
 }
 
