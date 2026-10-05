@@ -77,7 +77,8 @@ export type User = {
   dateOfBirth: string | null
   /** Derived from dateOfBirth for the age gate; null until the profile is complete. */
   age: number | null
-  preferredVenue: Venue | null
+  /** The user payload omits the venue's formats. */
+  preferredVenue: Omit<Venue, "formats"> | null
   /** False until fullName, mobileNumber and dateOfBirth are set. Booking is blocked while false. */
   profileComplete: boolean
 }
@@ -95,4 +96,11 @@ export type AuthSession = {
 export type ApiError = {
   message: string
   errors?: Record<string, string[]>
+}
+
+/** GET /filter-options — the lists the Sessions filters and profile form choose from. */
+export type FilterOptions = {
+  venues: Venue[]
+  formats: Format[]
+  ageRatings: AgeRating[]
 }

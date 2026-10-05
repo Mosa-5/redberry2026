@@ -3,11 +3,11 @@ import { DropdownMenu } from "radix-ui"
 import { Link, useMatch, useNavigate } from "react-router"
 
 import type { User } from "@/API/types"
-import Check from "@/assets/icons/check.svg?react"
 import ChevronDown from "@/assets/icons/chevron-down.svg?react"
 import Logout from "@/assets/icons/logout.svg?react"
 import Ticket from "@/assets/icons/ticket.svg?react"
 import UserIcon from "@/assets/icons/user.svg?react"
+import { ProfileStatus } from "@/components/Profile/profile-status"
 import { UserAvatar } from "@/components/user-avatar"
 import { useLogout } from "@/reactQuery/mutations/auth"
 
@@ -18,25 +18,6 @@ import { useLogout } from "@/reactQuery/mutations/auth"
  */
 const itemClass =
   "flex w-full cursor-pointer items-center gap-2 pl-5 type-label-m outline-none data-highlighted:bg-card"
-
-/** Orange "incomplete" or green "complete" banner (Figma "Profile status"). */
-const ProfileStatus = ({ complete }: { complete: boolean }) => {
-  if (complete) {
-    return (
-      <div className="flex items-center gap-1.5 rounded-sm bg-tint-green px-3 py-2.5 type-label-m text-success">
-        Profile Complete
-        <Check className="size-4" />
-      </div>
-    )
-  }
-
-  return (
-    <div className="flex flex-col gap-0.5 rounded-sm bg-tint-warning px-3 py-2.5">
-      <p className="type-label-m text-warning">Profile incomplete</p>
-      <p className="type-body-s text-muted-foreground">Please complete your profile to enable booking</p>
-    </div>
-  )
-}
 
 /**
  * The signed-in half of the navbar: avatar, first name and a dropdown
@@ -90,9 +71,8 @@ export const ProfileMenu = ({ user }: { user: User }) => {
                   My Profile
                 </Link>
               </DropdownMenu.Item>
-              {/* TODO: open the tickets section once the profile page has it. */}
               <DropdownMenu.Item asChild>
-                <Link to="/profile" className={cn(itemClass, "h-10 text-foreground")}>
+                <Link to="/profile?tab=tickets" className={cn(itemClass, "h-10 text-foreground")}>
                   <Ticket className="size-4" />
                   My Tickets
                 </Link>

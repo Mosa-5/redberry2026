@@ -45,3 +45,26 @@ export const me = async (): Promise<User> => {
   const response = await httpClient.get<{ data: User }>("/me")
   return response.data.data
 }
+
+export type ProfileInput = {
+  fullName: string
+  /** Spaces are fine — the API strips them before validating. */
+  mobileNumber: string
+  /** YYYY-MM-DD */
+  dateOfBirth: string
+  preferredVenueId?: number
+}
+
+/**
+ * Saves the profile and returns the updated user. Multipart, as the API
+ * expects (it also takes an avatar). There is no way to clear a preferred
+ * venue once set — the API ignores both an empty value and null.
+ */
+export const updateProfile = async ({ preferredVenueId, ...fields }: ProfileInput): Promise<User> => {
+  const form = new FormData()
+  Object.entries(fields).forEach(([key, value]) => form.append(key, value))
+  if (preferredVenueId !== undefined) form.append("preferredVenueId", String(preferredVenueId))
+
+  const response = await httpClient.put<{ data: User }>("/profile", form)
+  return response.data.data
+}

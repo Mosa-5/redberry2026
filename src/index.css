@@ -242,5 +242,9 @@
     /* The Figma frames are 1728 wide but the brief is tested at 1920.
        1920/1728 scales every rem-based size to match. */
     font-size: 111.11%;
+    /* Always reserve the scrollbar's width, so content doesn't jump
+       sideways when a page grows past the window (e.g. a skeleton being
+       replaced by the real content). */
+    scrollbar-gutter: stable;
     }
 }

@@ -1,9 +1,17 @@
 import { useMutation, useQueryClient, type QueryClient } from "@tanstack/react-query"
 import type { AxiosError } from "axios"
 
-import { login, logout, register, type LoginInput, type RegisterInput } from "@/API/requests/Auth"
+import {
+  login,
+  logout,
+  register,
+  updateProfile,
+  type LoginInput,
+  type ProfileInput,
+  type RegisterInput,
+} from "@/API/requests/Auth"
 import { setToken } from "@/API/token"
-import type { ApiError, AuthSession } from "@/API/types"
+import type { ApiError, AuthSession, User } from "@/API/types"
 
 /**
  * Shared by login and register. The user goes into the cache before the
@@ -50,5 +58,16 @@ export const useLogout = () => {
       // query and refetches the ones on screen.
       queryClient.resetQueries()
     },
+  })
+}
+
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient()
+  return useMutation<User, AxiosError<ApiError>, ProfileInput>({
+    mutationKey: ["updateProfile"],
+    mutationFn: updateProfile,
+    // The response is the saved user, so write it straight into ["me", token]
+    // (prefix match) — the navbar dot and banner update without a refetch.
+    onSuccess: (user) => queryClient.setQueriesData({ queryKey: ["me"] }, user),
   })
 }
