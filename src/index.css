@@ -247,4 +247,14 @@
        replaced by the real content). */
     scrollbar-gutter: stable;
     }
+  /* Radix menus, selects and dialogs lock scrolling via react-remove-scroll-bar,
+     which hides the scrollbar and adds a margin-right of its width to <body>.
+     With the gutter above already reserved, that margin pushes the page left
+     by a scrollbar width. Undo both: the scrollbar stays put, and scrolling
+     is still blocked by react-remove-scroll's wheel/touch listeners. The
+     `html` prefix outranks the library's own !important rule. */
+  html body[data-scroll-locked] {
+    overflow: visible !important;
+    margin-right: 0 !important;
+    }
 }

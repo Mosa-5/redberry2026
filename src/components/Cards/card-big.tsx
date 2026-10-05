@@ -16,12 +16,12 @@ type CardBigProps = {
  * Poster card — "Now Playing" on the home page (Figma 108:2446).
  *
  * Hover widens the card from 260 to 447 and reveals the synopsis. The poster
- * shrinks to absorb the change so the card's height stays fixed.
+ * shrinks to absorb the change so the card's height stays fixed. Only Buy
+ * Ticket navigates; the card itself is not a link.
  */
 export const CardBig = ({ movie, synopsis, className }: CardBigProps) => {
   return (
-    <Link
-      to={`/movies/${movie.slug}`}
+    <div
       className={cn(
         "group/card flex h-113 w-65 flex-col rounded-xl border border-transparent bg-card p-3.5 shadow-card",
         "transition-all duration-500 hover:w-111.75 hover:border-raised",
@@ -61,26 +61,34 @@ export const CardBig = ({ movie, synopsis, className }: CardBigProps) => {
           <p className="type-button whitespace-nowrap text-foreground">
             From ₾ {movie.fromPrice}
           </p>
-          <Button className="py-2.5">Buy Ticket</Button>
+          <Button asChild className="py-2.5">
+            <Link to={`/movies/${movie.slug}`}>Buy Ticket</Link>
+          </Button>
         </div>
       </div>
-    </Link>
+    </div>
   )
 }
 
 /** Loading stand-in with the resting card's footprint: poster, three text lines, price row. */
 export const CardBigSkeleton = () => {
   return (
-    <div className="flex h-113 w-65 flex-col gap-3 rounded-xl bg-card p-3.5 shadow-card">
-      <Skeleton className="h-75 w-full shrink-0 rounded-[0.875rem]" />
-      <div className="flex flex-1 flex-col gap-2">
+    <div className="flex h-113 w-65 flex-col gap-3 rounded-xl border border-transparent bg-card p-3.5 shadow-card">
+      {/* Like the real poster, this is the one item that gives up height,
+          so the price row always keeps the card's bottom padding. */}
+      <Skeleton className="min-h-0 w-full flex-1 basis-75 rounded-[0.875rem]" />
+      <div className="flex shrink-0 flex-col gap-2">
         <Skeleton className="h-6 w-3/4" />
         <Skeleton className="h-4 w-1/2" />
         <Skeleton className="h-5.5 w-10 rounded-full" />
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex shrink-0 items-center justify-between">
         <Skeleton className="h-4 w-20" />
-        <Skeleton className="h-9.25 w-28 rounded-full" />
+        {/* The real Button with its label hidden, so the size can't drift
+            from the card's Buy Ticket. */}
+        <Button asChild className="animate-pulse bg-raised py-2.5 text-transparent hover:bg-raised">
+          <span aria-hidden>Buy Ticket</span>
+        </Button>
       </div>
     </div>
   )

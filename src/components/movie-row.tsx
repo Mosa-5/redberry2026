@@ -45,8 +45,10 @@ export const MovieRow = ({ gap = 20, children, className }: MovieRowProps) => {
     <Carousel setApi={setApi} opts={{ align: "start" }} className={className}>
       {/* ml-0 drops shadcn's negative-margin gutter; the gap is explicit
           because the two rows use different values. */}
+      {/* Drag is the only way to scroll a row, so the cursor says so.
+          Buttons and links inside keep their pointer. */}
       <CarouselContent
-        className={cn("ml-0", dragging && "select-none")}
+        className={cn("ml-0 cursor-grab", dragging && "cursor-grabbing select-none")}
         style={{ gap }}
       >
         {Children.map(children, (child) => (
