@@ -75,3 +75,11 @@ export const movieSessions = async (slug: string, date: string): Promise<VenueSe
   })
   return response.data.data
 }
+
+/**
+ * Subscribes the signed-in user to a coming soon title. Repeat calls are a
+ * no-op that still succeed, and there is no unsubscribe.
+ */
+export const notifyMovie = async (slug: string): Promise<void> => {
+  await httpClient.post(`/movies/${slug}/notify`)
+}

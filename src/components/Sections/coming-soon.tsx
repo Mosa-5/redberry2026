@@ -49,8 +49,7 @@ export const ComingSoon = ({ limit }: ComingSoonProps) => {
       ) : (
         <MovieRow gap={20}>
           {movies.map((movie) => (
-            // TODO: wire onNotify to POST /movies/{movie}/notify
-            <CardMedium key={movie.id} movie={movie} notified={movie.isNotified} />
+            <CardMedium key={movie.id} movie={movie} />
           ))}
         </MovieRow>
       )}

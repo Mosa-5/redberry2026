@@ -4,6 +4,7 @@ import { cn } from "cn"
 import type { MovieDetail, Session, VenueSessions } from "@/API/types"
 import Calendar from "@/assets/icons/calendar.svg?react"
 import { SessionTicket } from "@/components/Movie/session-ticket"
+import { NotifyButton } from "@/components/notify-button"
 import { Skeleton } from "@/components/skeleton"
 import { ErrorMessage, StateMessage } from "@/components/state-message"
 import { fromIsoDate, toIsoDate } from "@/lib/dates"
@@ -166,6 +167,7 @@ export const MovieSessions = ({ movie, viewerAge, onSelect }: MovieSessionsProps
           icon={<Calendar className="size-5" />}
           title="Not in cinemas yet"
           body={`Sessions open when it's released — ${releaseLabel(movie.releaseDate).toLowerCase()}.`}
+          action={<NotifyButton movie={movie} />}
           className="w-fit items-start text-left"
         />
       ) : selected.isLoading ? (

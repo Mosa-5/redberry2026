@@ -1,17 +1,12 @@
 import { cn } from "cn"
 
 import type { Movie } from "@/API/types"
-import Bell from "@/assets/icons/bell.svg?react"
-import Check from "@/assets/icons/check.svg?react"
+import { NotifyButton } from "@/components/notify-button"
 import { Skeleton } from "@/components/skeleton"
-import { Button } from "@/components/ui/button"
 import { releaseLabel } from "@/lib/format"
 
 type CardMediumProps = {
   movie: Movie
-  /** Whether the viewer already has a reminder set for this title. */
-  notified?: boolean
-  onNotify?: () => void
   className?: string
 }
 
@@ -22,8 +17,6 @@ type CardMediumProps = {
  */
 export const CardMedium = ({
   movie,
-  notified,
-  onNotify,
   className,
 }: CardMediumProps) => {
   return (
@@ -58,19 +51,7 @@ export const CardMedium = ({
           </span>
         </div>
 
-        <Button
-          variant="notify"
-          size="sm"
-          aria-pressed={notified}
-          onClick={onNotify}
-        >
-          {notified ? (
-            <Check className="size-4" />
-          ) : (
-            <Bell className="size-4" />
-          )}
-          {notified ? "Reminder set" : "Notify Me"}
-        </Button>
+        <NotifyButton movie={movie} />
       </div>
     </div>
   )
