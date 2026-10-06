@@ -4,6 +4,7 @@ import { cn } from "cn"
 import type { Movie } from "@/API/types"
 import Ticket from "@/assets/icons/ticket.svg?react"
 import Timer from "@/assets/icons/timer.svg?react"
+import { Badge } from "@/components/badge"
 import { Button } from "@/components/ui/button"
 import { premiereLabel } from "@/lib/format"
 
@@ -78,23 +79,3 @@ export const HeroSlide = ({ movie, active }: HeroSlideProps) => {
     </>
   )
 }
-
-const Badge = ({
-  className,
-  children,
-}: {
-  className?: string
-  children: React.ReactNode
-}) => {
-  return (
-    <span
-      className={cn(
-        "flex items-center gap-1 rounded-full px-3 py-1.5 type-label-s",
-        className
-      )}
-    >
-      {children}
-    </span>
-  )
-}
-

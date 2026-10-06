@@ -1,14 +1,15 @@
-import { skipToken, useQuery, type UseQueryResult } from "@tanstack/react-query"
+import { skipToken, useQueries, useQuery, type UseQueryResult } from "@tanstack/react-query"
 import type { AxiosError } from "axios"
 
 import {
   comingSoonMovies,
   featuredMovies,
   movieDetail,
+  movieSessions,
   nowPlayingMovies,
   searchMovies,
 } from "@/API/requests/Catalogue"
-import type { Movie, MovieDetail } from "@/API/types"
+import type { Movie, MovieDetail, VenueSessions } from "@/API/types"
 import type { HookOptions } from "@/reactQuery/types"
 
 export const useGetFeaturedMovies = <T = Movie[]>(
@@ -65,4 +66,19 @@ export const useGetMovieDetail = <T = MovieDetail>(
     queryFn: slug ? () => movieDetail(slug) : skipToken,
     ...queryOptions,
   })
+}
+
+/**
+ * A film's sessions for several dates at once — one query per date, in
+ * parallel. The details page needs the week's total for its subtitle, and
+ * having every day cached makes switching days instant. Pass `enabled:
+ * false` for a coming soon title, which has no sessions on any date.
+ */
+export const useGetMovieSessions = (slug: string | undefined, dates: string[], enabled = true) => {
+  return useQueries({
+    queries: dates.map((date) => ({
+      queryKey: ["movieSessions", slug, date],
+      queryFn: slug && enabled ? () => movieSessions(slug, date) : skipToken,
+    })),
+  }) as UseQueryResult<VenueSessions[], AxiosError>[]
 }

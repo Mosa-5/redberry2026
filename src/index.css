@@ -155,6 +155,17 @@
   scrollbar-color: var(--primary) transparent;
 }
 
+/* Session ticket shape (Figma Sessions, 119:3760): two semicircle notches,
+   7px radius, cut at the perforation — the same geometry as the Figma
+   ticket SVG. A mask instead of the SVG so the perforation can sit at any
+   x; set --perforation on the element. */
+@utility ticket-notches {
+  mask:
+    radial-gradient(circle 0.4375rem at var(--perforation) 0, #0000 98%, #000),
+    radial-gradient(circle 0.4375rem at var(--perforation) 100%, #0000 98%, #000);
+  mask-composite: intersect;
+}
+
 /* Holds a dropdown invisible while the control beneath it finishes resizing,
    so its edges never sit proud of the control. Pair with an animation delay;
    `backwards` fill applies the from-state during that delay. */

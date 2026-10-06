@@ -104,3 +104,38 @@ export type FilterOptions = {
   formats: Format[]
   ageRatings: AgeRating[]
 }
+
+export type Language = {
+  id: number
+  slug: string
+  name: string
+  /** Short label for cards, e.g. "ENG", "GEO". */
+  code: string
+}
+
+/** One showtime. */
+export type Session = {
+  id: number
+  startsAt: string
+  /** "YYYY-MM-DD" */
+  date: string
+  /** "19:30" */
+  time: string
+  timeBand: "morning" | "afternoon" | "evening"
+  /** Adult price, format uplift included. */
+  price: number
+  /** Live: drops as others buy or hold seats. */
+  seatsLeft: number
+  /** Show the card disabled rather than hiding it, so the time stays readable. */
+  isSoldOut: boolean
+  hall: { id: number; name: string }
+  venue: Omit<Venue, "formats">
+  format: Format
+  language: Language
+}
+
+/** /movies/{movie}/sessions groups one date's sessions by venue. */
+export type VenueSessions = {
+  venue: Omit<Venue, "formats">
+  sessions: Session[]
+}

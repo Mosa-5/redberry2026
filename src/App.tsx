@@ -4,6 +4,7 @@ import { AuthDialogProvider } from "./components/Auth/auth-dialog-provider"
 import { AuthGuard } from "./components/Auth/auth-guard"
 import DashboardLayout from "./layouts/dashboardLayout"
 import Home from "./pages/Home"
+import Movie from "./pages/Movie"
 import Profile from "./pages/Profile"
 
 const App = () => {
@@ -14,6 +15,7 @@ const App = () => {
       <Routes>
         <Route element={<DashboardLayout />}>
           <Route index element={<Home />} />
+          <Route path="movies/:slug" element={<Movie />} />
           <Route element={<AuthGuard />}>
             <Route path="profile" element={<Profile />} />
           </Route>

@@ -1,5 +1,5 @@
 import { httpClient } from "../index";
-import type { Movie, MovieDetail } from "../types";
+import type { Movie, MovieDetail, VenueSessions } from "../types";
 
 /** Header typeahead. Returns at most 6 matches; a blank query returns []. */
 export const searchMovies = async (name:string):Promise<Movie[]>  => {
@@ -63,4 +63,15 @@ export const movieDetail = async (slug: string): Promise<MovieDetail> => {
     console.error("Error fetching movie detail:", error)
     throw error
   }
+}
+
+/**
+ * One date's sessions for a film, grouped by venue. Coming soon titles
+ * return an empty array on every date.
+ */
+export const movieSessions = async (slug: string, date: string): Promise<VenueSessions[]> => {
+  const response = await httpClient.get<{ data: VenueSessions[] }>(`/movies/${slug}/sessions`, {
+    params: { date },
+  })
+  return response.data.data
 }
