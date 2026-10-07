@@ -18,3 +18,11 @@ export const yearsAgo = (years: number) => {
   date.setHours(0, 0, 0, 0)
   return date
 }
+
+/** Today and the following days, as "YYYY-MM-DD" — the brief's 7-day pickers. */
+export const nextDays = (count: number) =>
+  Array.from({ length: count }, (_, offset) => {
+    const date = new Date()
+    date.setDate(date.getDate() + offset)
+    return toIsoDate(date)
+  })

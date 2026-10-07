@@ -65,7 +65,7 @@ function SelectContent({
         {...props}
       >
         <SelectScrollUpButton />
-        <SelectPrimitive.Viewport className="scrollbar-thin flex flex-col gap-0.5">{children}</SelectPrimitive.Viewport>
+        <SelectPrimitive.Viewport className="scrollbar-brand flex flex-col gap-0.5">{children}</SelectPrimitive.Viewport>
         <SelectScrollDownButton />
       </SelectPrimitive.Content>
     </SelectPrimitive.Portal>

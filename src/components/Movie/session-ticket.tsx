@@ -1,7 +1,7 @@
 import { cn } from "cn"
 
 import type { Session } from "@/API/types"
-import Seat from "@/assets/icons/seat.svg?react"
+import SeatsLeft from "@/assets/icons/seats-left.svg?react"
 
 type SessionTicketProps = {
   session: Session
@@ -56,7 +56,7 @@ export const SessionTicket = ({ session, disabled, onSelect }: SessionTicketProp
             "Sold out"
           ) : (
             <>
-              <Seat className="size-3" />
+              <SeatsLeft className="size-3" />
               {session.seatsLeft} left
             </>
           )}

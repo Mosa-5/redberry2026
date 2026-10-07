@@ -147,12 +147,41 @@
   font-weight: 400;
 }
 
-/* Thin scrollbar in the brand red. Uses the standard properties rather than
-   ::-webkit-scrollbar — browsers ignore those pseudo-elements once
-   scrollbar-color is set, and these work in Firefox too. */
-@utility scrollbar-thin {
-  scrollbar-width: thin;
-  scrollbar-color: var(--primary) transparent;
+/* Thin scrollbar in the brand red: just the bar, no arrow buttons.
+   Not named scrollbar-thin: Tailwind 4.3 has a built-in utility by that name
+   (scrollbar-width: thin), and the two would combine — which makes Chrome
+   drop every rule below.
+   Chromium and Safari get ::-webkit-scrollbar, the only way to hide the
+   arrows (Chrome on Windows draws them with the standard properties).
+   Chrome ignores these pseudo-elements once scrollbar-width/-color are set,
+   so the standard properties go only to browsers without them — Firefox,
+   which draws no arrows anyway. */
+@utility scrollbar-brand {
+  /* Inset from the edge: the gutter is 14px but the thumb carries a 4px
+     transparent border clipped out of its background, so the visible bar is
+     6px with 4px of space either side. The track stops 8px short of the top
+     and bottom to stay clear of rounded corners. */
+  &::-webkit-scrollbar {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    margin-block: 0.5rem;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    background-clip: padding-box;
+    border: 0.25rem solid transparent;
+    border-radius: 9999px;
+  }
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+  @supports not selector(::-webkit-scrollbar) {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) transparent;
+  }
 }
 
 /* Session ticket shape (Figma Sessions, 119:3760): two semicircle notches,

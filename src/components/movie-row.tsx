@@ -11,6 +11,8 @@ import {
 type MovieRowProps = {
   /** Gap between cards, in px. Now Playing uses 17, Coming Soon 20. */
   gap?: number
+  /** The home rows feather the right edge; the Sessions page cuts off clean. */
+  fade?: boolean
   children: React.ReactNode
   className?: string
 }
@@ -24,7 +26,7 @@ type MovieRowProps = {
  * right edge is feathered. Embla supplies drag, which plain overflow-x
  * would not give a mouse user.
  */
-export const MovieRow = ({ gap = 20, children, className }: MovieRowProps) => {
+export const MovieRow = ({ gap = 20, fade = true, children, className }: MovieRowProps) => {
   const [api, setApi] = useState<CarouselApi>()
   const [dragging, setDragging] = useState(false)
 
@@ -58,7 +60,9 @@ export const MovieRow = ({ gap = 20, children, className }: MovieRowProps) => {
 
       {/* Figma feathers the right edge with a bg/page rectangle under a
           37px blur. A gradient is the cheaper equivalent. */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-18.25 bg-linear-to-l from-background to-transparent" />
+      {fade && (
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-18.25 bg-linear-to-l from-background to-transparent" />
+      )}
     </Carousel>
   )
 }

@@ -174,7 +174,7 @@ export const Search = ({ onSelect, className }: SearchProps) => {
                 </span>
               </div>
 
-              <Command.List className="scrollbar-thin flex max-h-85.5 flex-col gap-0.5 overflow-y-auto">
+              <Command.List className="scrollbar-brand flex max-h-85.5 flex-col gap-0.5 overflow-y-auto">
                 {results.map((result) => (
                   <Command.Item
                     key={result.id}

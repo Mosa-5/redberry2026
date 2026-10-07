@@ -7,17 +7,9 @@ import { SessionTicket } from "@/components/Movie/session-ticket"
 import { NotifyButton } from "@/components/notify-button"
 import { Skeleton } from "@/components/skeleton"
 import { ErrorMessage, StateMessage } from "@/components/state-message"
-import { fromIsoDate, toIsoDate } from "@/lib/dates"
+import { fromIsoDate, nextDays } from "@/lib/dates"
 import { releaseLabel } from "@/lib/format"
 import { useGetMovieSessions } from "@/reactQuery/query/catalogue"
-
-/** Today and the six days after it, as "YYYY-MM-DD" — the brief's "next 7 days". */
-const nextSevenDays = () =>
-  Array.from({ length: 7 }, (_, offset) => {
-    const date = new Date()
-    date.setDate(date.getDate() + offset)
-    return toIsoDate(date)
-  })
 
 const weekdayFormat = new Intl.DateTimeFormat("en-GB", { weekday: "short" })
 
@@ -111,7 +103,7 @@ type MovieSessionsProps = {
 
 /** Sessions column (Figma 148:3931): week count, day picker, the day's sessions by venue and hall. */
 export const MovieSessions = ({ movie, viewerAge, onSelect }: MovieSessionsProps) => {
-  const [dates] = useState(nextSevenDays)
+  const [dates] = useState(() => nextDays(7))
   const [selectedDate, setSelectedDate] = useState(dates[0])
   const days = useGetMovieSessions(movie.slug, dates, !movie.isComingSoon)
 

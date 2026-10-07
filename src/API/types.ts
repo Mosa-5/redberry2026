@@ -98,12 +98,20 @@ export type ApiError = {
   errors?: Record<string, string[]>
 }
 
+export type TimeBand = "morning" | "afternoon" | "evening"
+
 /** GET /filter-options — the lists the Sessions filters and profile form choose from. */
 export type FilterOptions = {
   venues: Venue[]
   formats: Format[]
+  languages: Language[]
+  /** label like "Morning (before 12:00)". */
+  timeBands: { id: TimeBand; label: string }[]
+  sorts: { id: SessionSort; label: string }[]
   ageRatings: AgeRating[]
 }
+
+export type SessionSort = "time_asc" | "time_desc" | "price_asc" | "price_desc" | "title_asc"
 
 export type Language = {
   id: number
@@ -121,7 +129,7 @@ export type Session = {
   date: string
   /** "19:30" */
   time: string
-  timeBand: "morning" | "afternoon" | "evening"
+  timeBand: TimeBand
   /** Adult price, format uplift included. */
   price: number
   /** Live: drops as others buy or hold seats. */
@@ -138,4 +146,24 @@ export type Session = {
 export type VenueSessions = {
   venue: Omit<Venue, "formats">
   sessions: Session[]
+}
+
+/** One film's showtimes on the Sessions page. */
+export type MovieSessions = {
+  movie: Movie
+  sessions: Session[]
+}
+
+/** GET /sessions. Pagination counts films, not sessions — 10 films a page. */
+export type SessionsPage = {
+  data: MovieSessions[]
+  meta: {
+    currentPage: number
+    lastPage: number
+    perPage: number
+    /** For "Showing X sessions". */
+    totalSessions: number
+    totalMovies: number
+    date: string
+  }
 }

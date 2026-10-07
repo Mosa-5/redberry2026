@@ -6,6 +6,7 @@ import DashboardLayout from "./layouts/dashboardLayout"
 import Home from "./pages/Home"
 import Movie from "./pages/Movie"
 import Profile from "./pages/Profile"
+import Sessions from "./pages/Sessions"
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
         <Route element={<DashboardLayout />}>
           <Route index element={<Home />} />
           <Route path="movies/:slug" element={<Movie />} />
+          <Route path="sessions" element={<Sessions />} />
           <Route element={<AuthGuard />}>
             <Route path="profile" element={<Profile />} />
           </Route>
