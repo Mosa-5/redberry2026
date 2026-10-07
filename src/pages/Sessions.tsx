@@ -1,8 +1,8 @@
 import { useEffect } from "react"
 
-import type { Session } from "@/API/types"
+import type { Movie, Session } from "@/API/types"
 import MagnifyingGlass from "@/assets/icons/magnifying-glass.svg?react"
-import { useAuthDialog } from "@/components/Auth/auth-dialog-context"
+import { useBooking } from "@/components/Booking/booking-context"
 import { FilterPanel } from "@/components/Sessions/filter-panel"
 import { MovieSessionsGroup, MovieSessionsGroupSkeleton } from "@/components/Sessions/movie-sessions-group"
 import { Pagination } from "@/components/Sessions/pagination"
@@ -18,16 +18,15 @@ const Sessions = () => {
   const { filters, update, activeCount } = useSessionFilters()
   const { data: options } = useGetFilterOptions()
   const { data, isLoading, isError, refetch } = useGetSessions({}, filters)
-  const { requireAuth } = useAuthDialog()
+  const { openBooking } = useBooking()
 
   // A new page of results starts from the top of the list.
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [filters.page])
 
-  // The brief: guests are asked to log in first, then booking carries on.
-  // TODO: open the booking modal for this session.
-  const onSelectSession = (session: Session) => requireAuth(() => void session)
+  // Login and the profile check happen inside openBooking.
+  const onSelectSession = (session: Session, movie: Movie) => openBooking(session, movie)
 
   const clearFilters = () => update({ venues: [], formats: [], languages: [], bands: [] })
 
@@ -95,7 +94,7 @@ const Sessions = () => {
               {data.data.map((group, index) => (
                 <div key={group.movie.id} className="flex flex-col gap-8">
                   {index > 0 && <div className="h-px w-full bg-raised" />}
-                  <MovieSessionsGroup group={group} onSelect={onSelectSession} />
+                  <MovieSessionsGroup group={group} onSelect={(session) => onSelectSession(session, group.movie)} />
                 </div>
               ))}
             </div>

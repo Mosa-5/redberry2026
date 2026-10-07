@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router"
+import { useLocation, useSearchParams } from "react-router"
 
 import type { FilterOptions } from "@/API/types"
 import { AgeNotice } from "@/components/Profile/age-notice"
@@ -81,6 +81,8 @@ const Profile = () => {
   const { data: user } = useGetMe()
   const { data: ratings = [] } = useGetFilterOptions({ queryOptions: { select: toAgeRatings } })
   const [searchParams, setSearchParams] = useSearchParams()
+  // Set by openBooking when an incomplete profile tried to book.
+  const fromBooking = (useLocation().state as { reason?: string } | null)?.reason === "booking"
   const tab = searchParams.get("tab") === "tickets" ? "tickets" : "information"
 
   return (
@@ -105,6 +107,9 @@ const Profile = () => {
                 page; Figma doesn't place them, so they sit above the form
                 at its width, reusing the dropdown's status banner. */}
             <div className="flex w-220 flex-col gap-3">
+              {fromBooking && !user.profileComplete && (
+                <p className="type-body-m text-foreground">Complete your profile to book tickets, then pick the session again.</p>
+              )}
               <ProfileStatus complete={user.profileComplete} />
               {user.age !== null && <AgeNotice age={user.age} ratings={ratings} />}
             </div>

@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router"
 
 import { AuthDialogProvider } from "./components/Auth/auth-dialog-provider"
 import { AuthGuard } from "./components/Auth/auth-guard"
+import { BookingProvider } from "./components/Booking/booking-provider"
 import DashboardLayout from "./layouts/dashboardLayout"
 import Home from "./pages/Home"
 import Movie from "./pages/Movie"
@@ -11,18 +12,21 @@ import Sessions from "./pages/Sessions"
 const App = () => {
   return (
     // The router is in main.tsx, so this provider — and App itself — can use
-    // router hooks; actions replayed after login navigate.
+    // router hooks; actions replayed after login navigate. Booking sits
+    // inside it because opening the modal may ask for a login first.
     <AuthDialogProvider>
-      <Routes>
-        <Route element={<DashboardLayout />}>
-          <Route index element={<Home />} />
-          <Route path="movies/:slug" element={<Movie />} />
-          <Route path="sessions" element={<Sessions />} />
-          <Route element={<AuthGuard />}>
-            <Route path="profile" element={<Profile />} />
+      <BookingProvider>
+        <Routes>
+          <Route element={<DashboardLayout />}>
+            <Route index element={<Home />} />
+            <Route path="movies/:slug" element={<Movie />} />
+            <Route path="sessions" element={<Sessions />} />
+            <Route element={<AuthGuard />}>
+              <Route path="profile" element={<Profile />} />
+            </Route>
           </Route>
-        </Route>
-      </Routes>
+        </Routes>
+      </BookingProvider>
     </AuthDialogProvider>
   )
 }

@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router"
 
 import type { Session } from "@/API/types"
 import Popcorn from "@/assets/icons/popcorn.svg?react"
-import { useAuthDialog } from "@/components/Auth/auth-dialog-context"
+import { useBooking } from "@/components/Booking/booking-context"
 import { MovieBanner } from "@/components/Movie/movie-banner"
 import { MovieDetails } from "@/components/Movie/movie-details"
 import { MovieSessions } from "@/components/Movie/movie-sessions"
@@ -43,17 +43,17 @@ const Movie = () => {
   const { slug } = useParams()
   const { data: movie, isLoading, isError, error, refetch } = useGetMovieDetail({}, slug)
   const { data: user } = useGetMe()
-  const { requireAuth } = useAuthDialog()
+  const { openBooking } = useBooking()
 
   // Opening a film is what Recently viewed tracks.
   useEffect(() => {
     if (movie) recordView(movie)
   }, [movie])
 
-  // The brief: a guest picking a session is asked to log in first, and the
-  // booking carries on afterwards.
-  // TODO: open the booking modal for this session (the next step).
-  const onSelectSession = (session: Session) => requireAuth(() => void session)
+  // Login and the profile check happen inside openBooking.
+  const onSelectSession = (session: Session) => {
+    if (movie) openBooking(session, movie)
+  }
 
   if (isLoading) return <MovieSkeleton />
 

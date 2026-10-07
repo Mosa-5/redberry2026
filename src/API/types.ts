@@ -109,6 +109,23 @@ export type FilterOptions = {
   timeBands: { id: TimeBand; label: string }[]
   sorts: { id: SessionSort; label: string }[]
   ageRatings: AgeRating[]
+  /** Booking: price ratios and the child block. Read from here, never hardcode. */
+  ticketTypes: TicketType[]
+  maxSeatsPerOrder: number
+  holdMinutes: number
+}
+
+export type TicketTypeSlug = "adult" | "child" | "student"
+
+export type TicketType = {
+  id: number
+  slug: TicketTypeSlug
+  name: string
+  /** Multiplied by the session price. */
+  priceRatio: number
+  note: string | null
+  /** Refused when the film's minAge is at or above this (child: 16). */
+  blockedFromRatingAge: number | null
 }
 
 export type SessionSort = "time_asc" | "time_desc" | "price_asc" | "price_desc" | "title_asc"
@@ -140,6 +157,76 @@ export type Session = {
   venue: Omit<Venue, "formats">
   format: Format
   language: Language
+}
+
+/** GET /sessions/{id} adds the film; the booking modal header is built from it. */
+export type SessionDetail = Session & { movie: Movie }
+
+/** `held` is someone else's live hold; `unavailable` is a gap with no seat. */
+export type SeatState = "available" | "sold" | "held" | "unavailable"
+
+export type Seat = {
+  /** Send as `seatId` when holding. */
+  id: number
+  /** "E7" — for summaries, the order and the ticket. */
+  code: string
+  /** "7" — inside the seat button. */
+  label: string
+  state: SeatState
+  /** A gangway runs to the right of this seat. Visual only. */
+  aisleAfter: boolean
+  /** Part of the signed-in user's own live hold. */
+  isMine: boolean
+}
+
+/** GET /sessions/{id}/seats. Sections hold rows, rows hold seats; never flatten. */
+export type SeatMap = {
+  sessionId: number
+  hall: { id: number; name: string; venue: Omit<Venue, "formats"> }
+  sections: {
+    name: string
+    rows: { label: string; seats: Seat[] }[]
+  }[]
+}
+
+export type SeatHold = {
+  holdId: string
+  sessionId: number
+  /** Tick the countdown against this, not secondsRemaining. */
+  expiresAt: string
+  secondsRemaining: number
+  /** False once expired; GET /holds/{id} still answers 200 then. */
+  isLive: boolean
+  subtotal: number
+  seats: {
+    seatId: number
+    code: string
+    ticketType: { slug: TicketTypeSlug; name: string }
+    price: number
+  }[]
+}
+
+export type Order = {
+  id: number
+  /** "KX-7QF2LD" — shown on the confirmation. */
+  reference: string
+  status: "paid" | "refunded"
+  totalPrice: number
+  paidAt: string
+  refundedAt: string | null
+  /** Paid and not started: the Upcoming tab. */
+  isUpcoming: boolean
+  /** Drives the Refund button; the 2-hour cutoff is already applied. */
+  isRefundable: boolean
+  cardLastFour: string
+  contact: { fullName: string; email: string; mobileNumber: string }
+  session: SessionDetail
+  tickets: {
+    id: number
+    seatCode: string
+    ticketType: { slug: TicketTypeSlug; name: string }
+    price: number
+  }[]
 }
 
 /** /movies/{movie}/sessions groups one date's sessions by venue. */
