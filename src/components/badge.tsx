@@ -1,4 +1,4 @@
-import { cn } from "cn"
+import { cn } from "@/lib/utils"
 
 /** Pill badge (Figma Badge, 108:2079) — colours come from the caller. */
 export const Badge = ({ className, children }: { className?: string; children: React.ReactNode }) => {

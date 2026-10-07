@@ -1,5 +1,5 @@
 import { useId, useState } from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/utils"
 
 import Calendar from "@/assets/icons/calendar.svg?react"
 import Check from "@/assets/icons/check.svg?react"

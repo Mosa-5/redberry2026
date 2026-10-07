@@ -1,4 +1,4 @@
-import { cn } from "cn"
+import { cn } from "@/lib/utils"
 
 import ErrorIcon from "@/assets/icons/error.svg?react"
 import { Button } from "@/components/ui/button"

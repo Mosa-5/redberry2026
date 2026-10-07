@@ -1,4 +1,4 @@
-import { cn } from "cn"
+import { cn } from "@/lib/utils"
 
 import type { Movie } from "@/API/types"
 import { NotifyButton } from "@/components/notify-button"

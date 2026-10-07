@@ -1,4 +1,4 @@
-import { cn } from "cn"
+import { cn } from "@/lib/utils"
 
 import type { Session } from "@/API/types"
 import SeatsLeft from "@/assets/icons/seats-left.svg?react"

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { AxiosError } from "axios"
-import { cn } from "cn"
+import { cn } from "@/lib/utils"
 import { useForm } from "react-hook-form"
 
 import type { ApiError } from "@/API/types"

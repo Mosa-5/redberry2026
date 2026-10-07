@@ -1,5 +1,5 @@
 import { Link } from "react-router"
-import { cn } from "cn"
+import { cn } from "@/lib/utils"
 
 import type { Movie } from "@/API/types"
 import Ticket from "@/assets/icons/ticket.svg?react"

@@ -2,7 +2,7 @@ import { Link } from "react-router"
 import { useCallback, useState, useSyncExternalStore } from "react"
 import Autoplay from "embla-carousel-autoplay"
 import Fade from "embla-carousel-fade"
-import { cn } from "cn"
+import { cn } from "@/lib/utils"
 
 import ArrowLeft from "@/assets/icons/arrow-left.svg?react"
 import Popcorn from "@/assets/icons/popcorn.svg?react"

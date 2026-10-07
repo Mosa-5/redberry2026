@@ -1,4 +1,4 @@
-import { cn } from "cn"
+import { cn } from "@/lib/utils"
 
 import type { User } from "@/API/types"
 import StatusComplete from "@/assets/icons/status-complete.svg?react"

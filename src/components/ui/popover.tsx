@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/utils"
 import { Popover as PopoverPrimitive } from "radix-ui"
 
 // Restyled to the same surface as the select list (after the search panel,

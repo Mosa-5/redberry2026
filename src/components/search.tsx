@@ -2,7 +2,7 @@ import { Link } from "react-router"
 import { useRef, useState } from "react"
 import { keepPreviousData } from "@tanstack/react-query"
 import { Command } from "cmdk"
-import { cn } from "cn"
+import { cn } from "@/lib/utils"
 
 import type { Movie } from "@/API/types"
 import Close from "@/assets/icons/close.svg?react"

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/utils"
 
 import type { MovieDetail, Session, VenueSessions } from "@/API/types"
 import Calendar from "@/assets/icons/calendar.svg?react"

@@ -1,4 +1,4 @@
-import { cn } from "cn"
+import { cn } from "@/lib/utils"
 import { DropdownMenu } from "radix-ui"
 import { Link, useMatch, useNavigate } from "react-router"
 

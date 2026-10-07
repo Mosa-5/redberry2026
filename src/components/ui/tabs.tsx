@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/utils"
 import { Tabs as TabsPrimitive } from "radix-ui"
 
 // Restyled to the Figma page-level Tab (Profile_tabs, 291:19217): Label/M,
