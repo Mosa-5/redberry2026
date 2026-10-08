@@ -16,3 +16,6 @@ export const releaseLabel = (releaseDate: string) => {
   const month = date.toLocaleString("en-GB", { month: "long" }).toUpperCase()
   return `IN CINEMAS ${day} ${month}`
 }
+
+/** 16 → "16", 13.2 → "13.20". Child and student prices are fractions of the adult one. */
+export const formatPrice = (amount: number) => (Number.isInteger(amount) ? String(amount) : amount.toFixed(2))

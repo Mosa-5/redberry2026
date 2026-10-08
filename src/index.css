@@ -160,10 +160,12 @@
   /* Inset from the edge: the gutter is 14px but the thumb carries a 4px
      transparent border clipped out of its background, so the visible bar is
      6px with 4px of space either side. The track stops 8px short of the top
-     and bottom to stay clear of rounded corners. */
+     and bottom to stay clear of rounded corners. A tighter spot can set
+     --scrollbar-size and --scrollbar-inset (custom properties, so there is
+     no class-order fight with this utility). */
   &::-webkit-scrollbar {
-    width: 0.875rem;
-    height: 0.875rem;
+    width: var(--scrollbar-size, 0.875rem);
+    height: var(--scrollbar-size, 0.875rem);
   }
   &::-webkit-scrollbar-track {
     background: transparent;
@@ -172,7 +174,7 @@
   &::-webkit-scrollbar-thumb {
     background: var(--primary);
     background-clip: padding-box;
-    border: 0.25rem solid transparent;
+    border: var(--scrollbar-inset, 0.25rem) solid transparent;
     border-radius: 9999px;
   }
   &::-webkit-scrollbar-button {
