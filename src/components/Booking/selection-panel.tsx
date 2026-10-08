@@ -76,6 +76,8 @@ type SelectionPanelProps = {
   onTicketType: (seatId: number, type: TicketTypeSlug) => void
   onRemove: (seatId: number) => void
   onNext: () => void
+  /** The hold request is in flight: Next shows it and can't be pressed again. */
+  holding: boolean
 }
 
 /** Right column of step 1 (Figma 243:1797): the picked seats, subtotal and Next. */
@@ -89,6 +91,7 @@ export const SelectionPanel = ({
   onTicketType,
   onRemove,
   onNext,
+  holding,
 }: SelectionPanelProps) => {
   const priceOf = (seat: SelectedSeat) => {
     const ratio = ticketTypes.find((type) => type.slug === seat.ticketType)?.priceRatio ?? 1
@@ -131,8 +134,8 @@ export const SelectionPanel = ({
           <span className="type-label-s text-foreground uppercase">Subtotal</span>
           <span className="type-h1 text-foreground">₾ {formatPrice(subtotal)}</span>
         </div>
-        <Button className="w-full" disabled={selection.length === 0 || ageNotice !== null} onClick={onNext}>
-          Next: Checkout
+        <Button className="w-full" disabled={selection.length === 0 || ageNotice !== null || holding} onClick={onNext}>
+          {holding ? "Holding your seats…" : "Next: Checkout"}
         </Button>
       </div>
     </div>

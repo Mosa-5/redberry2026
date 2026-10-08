@@ -1,15 +1,20 @@
+import { useQueryClient } from "@tanstack/react-query"
+import { isAxiosError } from "axios"
 import { useState } from "react"
 
-import type { Seat, SessionDetail, TicketTypeSlug } from "@/API/types"
+import type { Seat, SeatHold, SeatMap as SeatMapData, SessionDetail, TicketTypeSlug } from "@/API/types"
+import { HoldTimer } from "@/components/Booking/hold-timer"
 import { SeatMap } from "@/components/Booking/seat-map"
 import { SelectionPanel } from "@/components/Booking/selection-panel"
 import type { SelectedSeat } from "@/components/Booking/types"
 import { Skeleton } from "@/components/skeleton"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { fromIsoDate } from "@/lib/dates"
+import { clearSavedHold, readSavedHold, saveHold } from "@/lib/saved-hold"
 import { cn } from "@/lib/utils"
+import { useHoldSeats, type SeatConflict } from "@/reactQuery/mutations/booking"
 import { useGetMe } from "@/reactQuery/query/auth"
-import { useGetSessionDetail } from "@/reactQuery/query/booking"
+import { useGetHold, useGetSessionDetail } from "@/reactQuery/query/booking"
 import { useGetFilterOptions } from "@/reactQuery/query/sessions"
 
 export type BookingStep = "seats" | "checkout"
@@ -18,6 +23,9 @@ const STEPS: { id: BookingStep; label: string }[] = [
   { id: "seats", label: "Seats" },
   { id: "checkout", label: "Checkout" },
 ]
+
+/** The brief's wording, shown when the hold runs out. */
+const EXPIRED_NOTICE = "Your hold time expired. Please re-select your seats."
 
 /** "Galleria Tbilisi · Hall B · Tuesday 15 September · 16:30 · Standard · Original with Subtitles" */
 const sessionLine = (session: SessionDetail) => {
@@ -32,34 +40,100 @@ const sessionLine = (session: SessionDetail) => {
   ].join(" · ")
 }
 
-/** Step indicator (Figma Progress, 388:6297): a pill track, the current step filled red. */
-const StepIndicator = ({ step }: { step: BookingStep }) => {
+/** The hold's seats in the selection's shape, to restore the panel from it. */
+const toSelection = (hold: SeatHold): SelectedSeat[] =>
+  hold.seats.map((seat) => ({ seatId: seat.seatId, code: seat.code, ticketType: seat.ticketType.slug }))
+
+/** True when the hold already covers exactly these seats and types, so Next needn't hold again. */
+const matchesHold = (hold: SeatHold, selection: SelectedSeat[]) =>
+  hold.seats.length === selection.length &&
+  selection.every((picked) =>
+    hold.seats.some((seat) => seat.seatId === picked.seatId && seat.ticketType.slug === picked.ticketType)
+  )
+
+/** "G13 was" / "G13 and G14 were" */
+const lostSeatsText = (codes: string[]) =>
+  codes.length === 1 ? `${codes[0]} was` : `${codes.slice(0, -1).join(", ")} and ${codes.at(-1)} were`
+
+/** Title, session line and, once seats are held, the countdown. */
+const SessionHeader = ({ session, timer }: { session: SessionDetail; timer?: React.ReactNode }) => {
   return (
-    <ol className="flex gap-2 rounded-full bg-card">
-      {STEPS.map(({ id, label }) => (
-        <li
-          key={id}
-          aria-current={id === step ? "step" : undefined}
-          className={cn(
-            "flex flex-1 justify-center rounded-full px-4 py-2.5 type-label-s text-foreground uppercase",
-            id === step && "bg-primary"
-          )}
-        >
-          {label}
-        </li>
-      ))}
+    // Right padding keeps the timer clear of the close button. Figma has no
+    // close button here, but the brief requires one on every modal.
+    <div className="flex shrink-0 items-start gap-4 pr-10">
+      <DialogHeader className="min-w-0 flex-1">
+        <DialogTitle className="uppercase">{session.movie.title}</DialogTitle>
+        <DialogDescription>{sessionLine(session)}</DialogDescription>
+      </DialogHeader>
+      {timer}
+    </div>
+  )
+}
+
+type StepIndicatorProps = {
+  step: BookingStep
+  /** Moves to the other step; undefined when that isn't possible right now. */
+  onSwitch?: () => void
+}
+
+/**
+ * Step indicator (Figma Progress, 388:6297): a pill track, the current step
+ * filled red. The other step is a button, as in Figma: Checkout does what
+ * Next does, Seats goes back keeping the hold.
+ */
+const StepIndicator = ({ step, onSwitch }: StepIndicatorProps) => {
+  return (
+    <ol className="flex shrink-0 gap-2 rounded-full bg-card">
+      {STEPS.map(({ id, label }) => {
+        const current = id === step
+        const className = cn(
+          "flex w-full justify-center rounded-full px-4 py-2.5 type-label-s text-foreground uppercase",
+          current && "bg-primary"
+        )
+        return (
+          <li key={id} aria-current={current ? "step" : undefined} className="flex flex-1">
+            {current ? (
+              <span className={className}>{label}</span>
+            ) : (
+              <button
+                type="button"
+                disabled={!onSwitch}
+                onClick={onSwitch}
+                className={cn(className, "cursor-pointer disabled:cursor-default")}
+              >
+                {label}
+              </button>
+            )}
+          </li>
+        )
+      })}
     </ol>
   )
 }
 
+const PanelSkeleton = () => {
+  return (
+    <div className="flex flex-1 flex-col justify-between">
+      <Skeleton className="h-4.5 w-36 rounded-sm" />
+      <Skeleton className="h-10.25 w-full rounded-full" />
+    </div>
+  )
+}
+
 /**
- * Step 1, seat selection: the map on the left, the picked seats on the
- * right. Keyed by session, so its state starts fresh for every session.
+ * Both steps of the booking: seat selection (map + panel) and checkout.
+ * Owns the selection and the hold. Mounted fresh for every session, with a
+ * restored hold when the user already had one running.
  */
-const BookingFlow = ({ session }: { session: SessionDetail }) => {
+const BookingFlow = ({ session, restoredHold }: { session: SessionDetail; restoredHold: SeatHold | null }) => {
+  const queryClient = useQueryClient()
   const { data: options } = useGetFilterOptions()
   const { data: user } = useGetMe()
-  const [selection, setSelection] = useState<SelectedSeat[]>([])
+  const { mutateAsync: holdSeats, isPending: holding } = useHoldSeats()
+
+  const [step, setStep] = useState<BookingStep>(restoredHold ? "checkout" : "seats")
+  const [selection, setSelection] = useState<SelectedSeat[]>(() => (restoredHold ? toSelection(restoredHold) : []))
+  const [hold, setHold] = useState<SeatHold | null>(restoredHold)
   const [notice, setNotice] = useState<string | null>(null)
 
   const { minAge, code } = session.movie.ageRating
@@ -75,6 +149,10 @@ const BookingFlow = ({ session }: { session: SessionDetail }) => {
   const ticketTypes = (options?.ticketTypes ?? [])
     .filter((type) => type.blockedFromRatingAge === null || minAge < type.blockedFromRatingAge)
     .sort((a, b) => a.priceRatio - b.priceRatio)
+
+  const canContinue = selection.length > 0 && ageNotice === null && !holding
+
+  const refetchMap = () => queryClient.invalidateQueries({ queryKey: ["seatMap", session.id] })
 
   const toggleSeat = (seat: Seat) => {
     setNotice(null)
@@ -100,46 +178,149 @@ const BookingFlow = ({ session }: { session: SessionDetail }) => {
     setSelection(selection.filter((picked) => picked.seatId !== seatId))
   }
 
-  // TODO: hold the seats and move to checkout (the next step).
-  const goToCheckout = () => {}
+  /**
+   * The API docs' five steps for a 409: name the lost seats, mark them sold,
+   * drop them from the selection, keep the rest, refetch the map.
+   */
+  const recoverFromConflict = (contested: string[]) => {
+    setNotice(`${lostSeatsText(contested)} just taken by someone else. Your other seats are still selected.`)
+    queryClient.setQueryData<SeatMapData>(["seatMap", session.id], (map) =>
+      map && {
+        ...map,
+        sections: map.sections.map((section) => ({
+          ...section,
+          rows: section.rows.map((row) => ({
+            ...row,
+            seats: row.seats.map((seat) => (contested.includes(seat.code) ? { ...seat, state: "sold" } : seat)),
+          })),
+        })),
+      }
+    )
+    setSelection((current) => current.filter((picked) => !contested.includes(picked.code)))
+    refetchMap()
+  }
+
+  const goToCheckout = async () => {
+    // Back from checkout with nothing changed: the hold already covers it.
+    if (hold && matchesHold(hold, selection)) {
+      setStep("checkout")
+      return
+    }
+    setNotice(null)
+    try {
+      // Holding again replaces any earlier hold; no need to release it first.
+      const newHold = await holdSeats({
+        sessionId: session.id,
+        seats: selection.map(({ seatId, ticketType }) => ({ seatId, ticketType })),
+      })
+      saveHold({ holdId: newHold.holdId, sessionId: session.id })
+      setHold(newHold)
+      setStep("checkout")
+    } catch (error) {
+      if (!isAxiosError<SeatConflict>(error) || !error.response) {
+        setNotice("Couldn't hold your seats. Check your connection and try again.")
+        return
+      }
+      const { status, data } = error.response
+      if (status === 409) {
+        recoverFromConflict(data.contested ?? [])
+      } else if (status === 422) {
+        // Rule failures (profile, age, session started) and field errors
+        // both carry a message written for the user; show it as given.
+        setNotice(data.message)
+      } else if (status !== 401) {
+        setNotice("Couldn't hold your seats. Please try again.")
+      }
+    }
+  }
+
+  // The brief: at zero the seats are released, the selection cleared, the
+  // modal returns to step 1, the map is refetched and the reason is shown.
+  const expireHold = () => {
+    clearSavedHold()
+    setHold(null)
+    setSelection([])
+    setStep("seats")
+    setNotice(EXPIRED_NOTICE)
+    refetchMap()
+  }
+
+  const timer = hold && <HoldTimer key={hold.holdId} expiresAt={hold.expiresAt} onExpire={expireHold} />
+
+  const switchStep = step === "seats" ? (canContinue ? goToCheckout : undefined) : () => setStep("seats")
 
   return (
-    <div className="flex min-h-0 flex-1 gap-5">
-      <div className="flex w-180 shrink-0 flex-col">
-        <StepIndicator step="seats" />
-        <SeatMap
-          sessionId={session.id}
-          selectedIds={selection.map((picked) => picked.seatId)}
-          onToggle={toggleSeat}
-        />
-      </div>
-      <div className="w-px rounded-full bg-card" />
-      {options ? (
-        <SelectionPanel
-          selection={selection}
-          ticketTypes={ticketTypes}
-          maxSeats={options.maxSeatsPerOrder}
-          sessionPrice={session.price}
-          notice={notice}
-          ageNotice={ageNotice}
-          onTicketType={changeTicketType}
-          onRemove={removeSeat}
-          onNext={goToCheckout}
-        />
-      ) : (
-        <div className="flex flex-1 flex-col justify-between">
-          <Skeleton className="h-4.5 w-36 rounded-sm" />
-          <Skeleton className="h-10.25 w-full rounded-full" />
+    <>
+      <SessionHeader session={session} timer={timer} />
+
+      <div className="flex min-h-0 flex-1 gap-5">
+        <div className="flex w-180 shrink-0 flex-col">
+          <StepIndicator step={step} onSwitch={switchStep} />
+          {step === "seats" ? (
+            <SeatMap
+              sessionId={session.id}
+              selectedIds={selection.map((picked) => picked.seatId)}
+              onToggle={toggleSeat}
+            />
+          ) : (
+            // TODO: the checkout form (the next step).
+            <div className="flex-1" />
+          )}
         </div>
-      )}
-    </div>
+        <div className="w-px rounded-full bg-card" />
+        {step === "checkout" ? (
+          // TODO: the order summary (the next step).
+          <div className="flex-1" />
+        ) : options ? (
+          <SelectionPanel
+            selection={selection}
+            ticketTypes={ticketTypes}
+            maxSeats={options.maxSeatsPerOrder}
+            sessionPrice={session.price}
+            notice={notice}
+            ageNotice={ageNotice}
+            onTicketType={changeTicketType}
+            onRemove={removeSeat}
+            onNext={goToCheckout}
+            holding={holding}
+          />
+        ) : (
+          <PanelSkeleton />
+        )}
+      </div>
+    </>
   )
 }
 
 /**
- * The two-step booking modal (Figma Seat Selection, 265:3958): the session
- * header and the step for the current stage. Checkout and the confirmation
- * come in the next steps.
+ * Checks for a hold saved on an earlier visit (a reload, or logging out and
+ * back in) before the flow mounts, so the flow can start from it. Only a
+ * live hold is restored; an expired, released or another account's hold
+ * (403) is ignored.
+ */
+const BookingBody = ({ session }: { session: SessionDetail }) => {
+  const [savedHoldId] = useState(() => readSavedHold(session.id))
+  const { data: savedHold, isLoading } = useGetHold({}, savedHoldId ?? undefined)
+
+  if (isLoading) {
+    return (
+      <>
+        <SessionHeader session={session} />
+        <div className="flex min-h-0 flex-1 gap-5">
+          <Skeleton className="w-180 rounded-lg" />
+          <div className="w-px rounded-full bg-card" />
+          <PanelSkeleton />
+        </div>
+      </>
+    )
+  }
+
+  return <BookingFlow session={session} restoredHold={savedHold?.isLive ? savedHold : null} />
+}
+
+/**
+ * The two-step booking modal (Figma Seat Selection, 265:3958). The
+ * confirmation view comes in a later step.
  */
 export const BookingDialog = ({ sessionId, onClose }: { sessionId: number | null; onClose: () => void }) => {
   const { data: session } = useGetSessionDetail({}, sessionId ?? undefined)
@@ -153,24 +334,16 @@ export const BookingDialog = ({ sessionId, onClose }: { sessionId: number | null
       {/* Figma's frame is 1146×599 with no border, unlike the auth modals.
           Fixed: big halls zoom inside it rather than growing it. */}
       <DialogContent className="flex h-149.75 w-286.5 flex-col gap-8 border-0">
-        {/* Right padding keeps the text clear of the close button. Figma has
-            no close button here, but the brief requires one on every modal. */}
-        <DialogHeader className="shrink-0 pr-10">
-          {session ? (
-            <>
-              <DialogTitle className="uppercase">{session.movie.title}</DialogTitle>
-              <DialogDescription>{sessionLine(session)}</DialogDescription>
-            </>
-          ) : (
-            <>
-              <DialogTitle className="sr-only">Book tickets</DialogTitle>
-              <Skeleton className="h-5 w-48 rounded-sm" />
-              <Skeleton className="h-4 w-120 rounded-sm" />
-            </>
-          )}
-        </DialogHeader>
-
-        {session && <BookingFlow key={session.id} session={session} />}
+        {session ? (
+          // Keyed by session, so every session starts from a clean state.
+          <BookingBody key={session.id} session={session} />
+        ) : (
+          <DialogHeader className="shrink-0 pr-10">
+            <DialogTitle className="sr-only">Book tickets</DialogTitle>
+            <Skeleton className="h-5 w-48 rounded-sm" />
+            <Skeleton className="h-4 w-120 rounded-sm" />
+          </DialogHeader>
+        )}
       </DialogContent>
     </Dialog>
   )

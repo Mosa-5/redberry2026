@@ -43,27 +43,28 @@ const SeatButton = ({ seat, selected, onToggle }: { seat: Seat; selected: boolea
   // A gap in the plan: keep the cell so the grid stays aligned, but no button.
   if (seat.state === "unavailable") return <span aria-hidden className="size-13 shrink-0" />
 
-  const blocked = seat.state === "sold" || seat.state === "held"
+  // The user's own live hold comes back as "held" too, with isMine set. It
+  // is theirs, not blocked: treat it as available (selected once restored).
+  const state = seat.isMine ? "available" : seat.state
+  const blocked = state === "sold" || state === "held"
 
   return (
     <button
       type="button"
       disabled={blocked}
       aria-pressed={blocked ? undefined : selected}
-      aria-label={`Seat ${seat.code}, ${selected ? "selected" : STATE_LABELS[seat.state]}`}
+      aria-label={`Seat ${seat.code}, ${selected ? "selected" : STATE_LABELS[state]}`}
       onClick={() => onToggle(seat)}
       className={cn(
         "relative grid size-13 shrink-0 place-items-center overflow-hidden rounded-sm bg-card type-button outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
-        seat.state === "available" &&
-          !selected &&
-          "cursor-pointer border border-disabled text-foreground shadow-card",
+        state === "available" && !selected && "cursor-pointer border border-disabled text-foreground shadow-card",
         selected && "cursor-pointer border border-background bg-primary text-foreground",
-        seat.state === "sold" && "text-disabled",
-        seat.state === "held" && "text-muted-foreground"
+        state === "sold" && "text-disabled",
+        state === "held" && "text-muted-foreground"
       )}
     >
       {/* Figma's 83.6px stripes in a 52px seat. */}
-      {seat.state === "held" && <HeldStripes className="w-[160.9%]" />}
+      {state === "held" && <HeldStripes className="w-[160.9%]" />}
       <span className="relative">{seat.label}</span>
     </button>
   )

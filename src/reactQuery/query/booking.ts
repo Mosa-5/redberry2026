@@ -33,7 +33,10 @@ export const useGetSeatMap = <T = SeatMap>(
   })
 }
 
-/** A saved hold read back after a reload, to resume its countdown. */
+/**
+ * A saved hold read back after a reload, to restore it. Never served from
+ * cache: a hold replaced or released since would still look live there.
+ */
 export const useGetHold = <T = SeatHold>(
   { queryOptions }: HookOptions<SeatHold, T> = {},
   holdId?: string
@@ -42,6 +45,7 @@ export const useGetHold = <T = SeatHold>(
     queryKey: ["hold", holdId],
     queryFn: holdId ? () => hold(holdId) : skipToken,
     staleTime: 0,
+    gcTime: 0,
     ...queryOptions,
   })
 }
