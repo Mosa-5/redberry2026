@@ -26,3 +26,15 @@ export const nextDays = (count: number) =>
     date.setDate(date.getDate() + offset)
     return toIsoDate(date)
   })
+
+/**
+ * "YYYY-MM-DD" → "Tue 15 Sep", the booking summaries' format. Built from
+ * en-US parts: en-GB's short month is "Sept", Figma has "Sep".
+ */
+export const shortDay = (value: string) => {
+  const parts = new Intl.DateTimeFormat("en-US", { weekday: "short", day: "numeric", month: "short" }).formatToParts(
+    fromIsoDate(value)
+  )
+  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value
+  return `${part("weekday")} ${part("day")} ${part("month")}`
+}

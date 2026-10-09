@@ -65,19 +65,19 @@ export const BookingProvider = ({ children }: { children: React.ReactNode }) => 
   // Closing without paying gives the seats back at once rather than leaving
   // them blocked for the rest of the 8 minutes (the API docs' advice).
   // Going back from checkout to the map doesn't close, so it keeps the hold.
-  const close = () => {
+  const closeBooking = useCallback(() => {
     const holdId = sessionId === null ? null : readSavedHold(sessionId)
     if (holdId) releaseHold(holdId)
     clearSavedHold()
     setSessionId(null)
-  }
+  }, [sessionId, releaseHold])
 
-  const value = useMemo(() => ({ openBooking }), [openBooking])
+  const value = useMemo(() => ({ openBooking, closeBooking }), [openBooking, closeBooking])
 
   return (
     <BookingContext.Provider value={value}>
       {children}
-      <BookingDialog sessionId={sessionId} onClose={close} />
+      <BookingDialog sessionId={sessionId} onClose={closeBooking} />
     </BookingContext.Provider>
   )
 }

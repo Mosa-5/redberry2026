@@ -2,8 +2,11 @@ import { useQueryClient } from "@tanstack/react-query"
 import { isAxiosError } from "axios"
 import { useState } from "react"
 
-import type { Seat, SeatHold, SeatMap as SeatMapData, SessionDetail, TicketTypeSlug } from "@/API/types"
+import type { Order, Seat, SeatHold, SeatMap as SeatMapData, SessionDetail, TicketTypeSlug } from "@/API/types"
+import { CheckoutForm } from "@/components/Booking/checkout-form"
+import { Confirmation } from "@/components/Booking/confirmation"
 import { HoldTimer } from "@/components/Booking/hold-timer"
+import { CheckoutSummary } from "@/components/Booking/order-summary"
 import { SeatMap } from "@/components/Booking/seat-map"
 import { SelectionPanel } from "@/components/Booking/selection-panel"
 import type { SelectedSeat } from "@/components/Booking/types"
@@ -12,7 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { fromIsoDate } from "@/lib/dates"
 import { clearSavedHold, readSavedHold, saveHold } from "@/lib/saved-hold"
 import { cn } from "@/lib/utils"
-import { useHoldSeats, type SeatConflict } from "@/reactQuery/mutations/booking"
+import { useCreateOrder, useHoldSeats, type SeatConflict } from "@/reactQuery/mutations/booking"
 import { useGetMe } from "@/reactQuery/query/auth"
 import { useGetHold, useGetSessionDetail } from "@/reactQuery/query/booking"
 import { useGetFilterOptions } from "@/reactQuery/query/sessions"
@@ -120,21 +123,29 @@ const PanelSkeleton = () => {
   )
 }
 
+type BookingFlowProps = {
+  session: SessionDetail
+  restoredHold: SeatHold | null
+}
+
 /**
- * Both steps of the booking: seat selection (map + panel) and checkout.
- * Owns the selection and the hold. Mounted fresh for every session, with a
- * restored hold when the user already had one running.
+ * Both steps of the booking — seat selection (map + panel) and checkout —
+ * then the confirmation. Owns the selection, the hold and the order.
+ * Mounted fresh for every session, with a restored hold when the user
+ * already had one running.
  */
-const BookingFlow = ({ session, restoredHold }: { session: SessionDetail; restoredHold: SeatHold | null }) => {
+const BookingFlow = ({ session, restoredHold }: BookingFlowProps) => {
   const queryClient = useQueryClient()
   const { data: options } = useGetFilterOptions()
   const { data: user } = useGetMe()
   const { mutateAsync: holdSeats, isPending: holding } = useHoldSeats()
+  const { mutateAsync: createOrder, isPending: paying } = useCreateOrder()
 
   const [step, setStep] = useState<BookingStep>(restoredHold ? "checkout" : "seats")
   const [selection, setSelection] = useState<SelectedSeat[]>(() => (restoredHold ? toSelection(restoredHold) : []))
   const [hold, setHold] = useState<SeatHold | null>(restoredHold)
   const [notice, setNotice] = useState<string | null>(null)
+  const [order, setOrder] = useState<Order | null>(null)
 
   const { minAge, code } = session.movie.ageRating
   // The film page disables sessions for this; the Sessions page has no age
@@ -245,6 +256,23 @@ const BookingFlow = ({ session, restoredHold }: { session: SessionDetail; restor
     refetchMap()
   }
 
+  // Paid: the hold is spent, so forget it — otherwise closing would try to
+  // release it.
+  const completeOrder = (paid: Order) => {
+    clearSavedHold()
+    setHold(null)
+    setOrder(paid)
+  }
+
+  // The API docs: an order 409 gets the same recovery as a hold 409, back on
+  // the map where the user can pick again.
+  const recoverOrderConflict = (contested: string[]) => {
+    setStep("seats")
+    recoverFromConflict(contested)
+  }
+
+  if (order) return <Confirmation order={order} />
+
   const timer = hold && <HoldTimer key={hold.holdId} expiresAt={hold.expiresAt} onExpire={expireHold} />
 
   const switchStep = step === "seats" ? (canContinue ? goToCheckout : undefined) : () => setStep("seats")
@@ -256,21 +284,29 @@ const BookingFlow = ({ session, restoredHold }: { session: SessionDetail; restor
       <div className="flex min-h-0 flex-1 gap-5">
         <div className="flex w-180 shrink-0 flex-col">
           <StepIndicator step={step} onSwitch={switchStep} />
-          {step === "seats" ? (
+          {step === "checkout" && hold && user ? (
+            // Scrolls if error messages push the form past the fixed modal.
+            <div className="scrollbar-brand min-h-0 flex-1 overflow-y-auto">
+              <CheckoutForm
+                user={user}
+                holdId={hold.holdId}
+                createOrder={createOrder}
+                onPaid={completeOrder}
+                onConflict={recoverOrderConflict}
+                onExpired={expireHold}
+              />
+            </div>
+          ) : (
             <SeatMap
               sessionId={session.id}
               selectedIds={selection.map((picked) => picked.seatId)}
               onToggle={toggleSeat}
             />
-          ) : (
-            // TODO: the checkout form (the next step).
-            <div className="flex-1" />
           )}
         </div>
         <div className="w-px rounded-full bg-card" />
-        {step === "checkout" ? (
-          // TODO: the order summary (the next step).
-          <div className="flex-1" />
+        {step === "checkout" && hold ? (
+          <CheckoutSummary session={session} hold={hold} paying={paying} />
         ) : options ? (
           <SelectionPanel
             selection={selection}
@@ -318,10 +354,7 @@ const BookingBody = ({ session }: { session: SessionDetail }) => {
   return <BookingFlow session={session} restoredHold={savedHold?.isLive ? savedHold : null} />
 }
 
-/**
- * The two-step booking modal (Figma Seat Selection, 265:3958). The
- * confirmation view comes in a later step.
- */
+/** The two-step booking modal and its confirmation (Figma Seat Selection, 265:3958). */
 export const BookingDialog = ({ sessionId, onClose }: { sessionId: number | null; onClose: () => void }) => {
   const { data: session } = useGetSessionDetail({}, sessionId ?? undefined)
 

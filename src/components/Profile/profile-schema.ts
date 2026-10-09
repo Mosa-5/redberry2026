@@ -39,7 +39,7 @@ export const profileSchema = z.object({
 export type ProfileValues = z.infer<typeof profileSchema>
 
 /** "599123456" → "599 123 456", the way the design shows it. */
-const formatMobile = (value: string) => value.replace(/^(\d{3})(\d{3})(\d{3})$/, "$1 $2 $3")
+export const formatMobile = (value: string) => value.replace(/^(\d{3})(\d{3})(\d{3})$/, "$1 $2 $3")
 
 export const toProfileValues = (user: User): ProfileValues => ({
   fullName: user.fullName ?? "",

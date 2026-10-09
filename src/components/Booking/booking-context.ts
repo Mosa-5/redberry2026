@@ -9,6 +9,8 @@ export type BookingContextValue = {
    * The film comes along because a session from the lists doesn't carry it.
    */
   openBooking: (session: Session, movie: Movie) => void
+  /** Closes the modal, releasing an unpaid hold. For anything inside it that leaves, like the confirmation's buttons. */
+  closeBooking: () => void
 }
 
 export const BookingContext = createContext<BookingContextValue | null>(null)

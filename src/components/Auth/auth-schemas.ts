@@ -4,7 +4,7 @@ import { z } from "zod"
 // API enforces the same ones; checking here gives the on-blur feedback the
 // brief asks for, and the server still has the last word on uniqueness.
 
-const email = z.email({
+export const email = z.email({
   error: (issue) => (issue.input === "" ? "Email is required" : "Enter a valid email"),
 })
 
