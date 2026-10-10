@@ -1,7 +1,8 @@
 import { useLocation, useSearchParams } from "react-router"
 
-import type { FilterOptions } from "@/API/types"
+import type { FilterOptions, Order } from "@/API/types"
 import { AgeNotice } from "@/components/Profile/age-notice"
+import { MyTickets } from "@/components/Profile/my-tickets"
 import { PersonalInfoForm } from "@/components/Profile/personal-info-form"
 import { ProfileStatus } from "@/components/Profile/profile-status"
 import { Skeleton } from "@/components/skeleton"
@@ -9,8 +10,10 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useGetMe } from "@/reactQuery/query/auth"
 import { useGetFilterOptions } from "@/reactQuery/query/sessions"
+import { useGetTickets } from "@/reactQuery/query/tickets"
 
 const toAgeRatings = (options: FilterOptions) => options.ageRatings
+const toUpcomingCount = (orders: Order[]) => orders.filter((order) => order.isUpcoming).length
 
 /** A field's label and 40px box, with the real label text hidden inside for its height. */
 const FieldSkeleton = ({ label, hint }: { label: string; hint?: string }) => {
@@ -80,6 +83,7 @@ const InformationSkeleton = () => {
 const Profile = () => {
   const { data: user } = useGetMe()
   const { data: ratings = [] } = useGetFilterOptions({ queryOptions: { select: toAgeRatings } })
+  const { data: upcomingCount = 0 } = useGetTickets({ queryOptions: { select: toUpcomingCount } })
   const [searchParams, setSearchParams] = useSearchParams()
   // Set by openBooking when an incomplete profile tried to book.
   const fromBooking = (useLocation().state as { reason?: string } | null)?.reason === "booking"
@@ -95,8 +99,13 @@ const Profile = () => {
         <h1 className="type-h1 text-foreground">My Profile</h1>
         <TabsList>
           <TabsTrigger value="information">Personal Information</TabsTrigger>
-          {/* TODO: the ticket count badge, once tickets are loaded. */}
-          <TabsTrigger value="tickets">My Tickets</TabsTrigger>
+          <TabsTrigger value="tickets">
+            My Tickets
+            {/* Figma's Count: the number of upcoming tickets (it matches the Upcoming count). */}
+            {upcomingCount > 0 && (
+              <span className="rounded-full bg-primary px-1.5 py-0.5 type-label-s text-foreground">{upcomingCount}</span>
+            )}
+          </TabsTrigger>
         </TabsList>
       </div>
 
@@ -120,8 +129,9 @@ const Profile = () => {
         )}
       </TabsContent>
 
-      {/* TODO: My Tickets — Upcoming and Past, with refunds. */}
-      <TabsContent value="tickets" />
+      <TabsContent value="tickets">
+        <MyTickets />
+      </TabsContent>
     </Tabs>
   )
 }

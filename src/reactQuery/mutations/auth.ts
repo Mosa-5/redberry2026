@@ -21,9 +21,13 @@ import type { ApiError, AuthSession, User } from "@/API/types"
 const startSession = (queryClient: QueryClient, { user, token }: AuthSession) => {
   queryClient.setQueryData(["me", token], user)
   setToken(token)
-  // Notify Me state is per user.
+  // Notify Me state and tickets are per user.
   queryClient.invalidateQueries({ queryKey: ["comingSoonMovies"] })
   queryClient.invalidateQueries({ queryKey: ["movie"] })
+  // Removed, not invalidated: a 401 or another tab's logout leaves the
+  // previous user's tickets cached, and stale data would still show while
+  // the refetch runs.
+  queryClient.removeQueries({ queryKey: ["tickets"] })
 }
 
 export const useLogin = () => {

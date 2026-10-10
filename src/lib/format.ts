@@ -1,5 +1,5 @@
 import type { SessionDetail } from "@/API/types"
-import { shortDay } from "@/lib/dates"
+import { fromIsoDate, shortDay, toIsoDate } from "@/lib/dates"
 
 /**
  * "PREMIERE · WEEK OF 15 SEPT" for the hero banner. Derived from the release
@@ -35,3 +35,17 @@ export const sessionShortLine = (session: SessionDetail, withVenue = false) =>
   [withVenue && session.venue.name, `Hall ${session.hall.name}`, shortDay(session.date), session.time]
     .filter(Boolean)
     .join(" · ")
+
+/**
+ * "14:30, Tue 15 Sep": two hours before the session, for the refund caption
+ * (display only; isRefundable decides the button). Built from the session's
+ * date and time, the same clock every other screen shows.
+ */
+export const refundDeadline = (session: SessionDetail) => {
+  const [hours, minutes] = session.time.split(":").map(Number)
+  const deadline = fromIsoDate(session.date)
+  // setHours rolls back to the previous day when the hour goes negative.
+  deadline.setHours(hours - 2, minutes)
+  const time = [deadline.getHours(), deadline.getMinutes()].map((part) => String(part).padStart(2, "0")).join(":")
+  return `${time}, ${shortDay(toIsoDate(deadline))}`
+}
