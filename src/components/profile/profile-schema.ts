@@ -3,8 +3,8 @@ import { z } from "zod"
 import type { User } from "@/api/types"
 import { toIsoDate, yearsAgo } from "@/lib/dates"
 
-// Rules and messages word for word from the brief (ASSIGNMENT.md,
-// Personal Information). The API returns the same strings, so client and
+// Rules and messages word for word from the brief (Personal
+// Information). The API returns the same strings, so client and
 // server errors read the same.
 
 /** The API strips spaces, so "599 123 456" and "599123456" are both fine. */

@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-// Rules from the brief (ASSIGNMENT.md, Login and Registration modals). The
+// Rules from the brief (Login and Registration modals). The
 // API enforces the same ones; checking here gives the on-blur feedback the
 // brief asks for, and the server still has the last word on uniqueness.
 

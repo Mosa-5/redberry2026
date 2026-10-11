@@ -4,7 +4,7 @@ import type { User } from "@/api/types"
 import { email } from "@/components/auth/auth-schemas"
 import { formatMobile, profileSchema } from "@/components/profile/profile-schema"
 
-// The brief's checkout rules (ASSIGNMENT.md, Step 2). Name, email and mobile
+// The brief's checkout rules (Step 2: Checkout). Name, email and mobile
 // reuse the profile and registration rules and messages, since the fields
 // are prefilled from the account.
 // The brief gives no wording for the card fields; these are ours. The API
