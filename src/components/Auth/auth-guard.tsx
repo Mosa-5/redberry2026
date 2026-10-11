@@ -12,13 +12,14 @@ import { useToken } from "@/hooks/use-token"
  */
 export const AuthGuard = () => {
   const token = useToken()
-  const { pathname } = useLocation()
+  // With the query too, so /profile?tab=tickets comes back on its tab.
+  const { pathname, search } = useLocation()
   const navigate = useNavigate()
   const { requireAuth } = useAuthDialog()
 
   useEffect(() => {
-    if (!token) requireAuth(() => navigate(pathname))
-  }, [token, requireAuth, navigate, pathname])
+    if (!token) requireAuth(() => navigate(pathname + search))
+  }, [token, requireAuth, navigate, pathname, search])
 
   if (!token) return <Navigate to="/" replace />
   return <Outlet />

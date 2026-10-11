@@ -13,25 +13,37 @@ import { useNotifyMovie } from "@/reactQuery/mutations/catalogue"
  */
 export const NotifyButton = ({ movie }: { movie: Movie }) => {
   const { requireAuth } = useAuthDialog()
-  const { mutate: notify, isPending } = useNotifyMovie()
+  const { mutate: notify, isPending, error } = useNotifyMovie()
   const notified = !!movie.isNotified
+  // A 401 that reaches here means the user closed the login modal; nothing
+  // failed that they need telling about.
+  const failed = !!error && error.response?.status !== 401
 
   return (
-    <Button
-      variant="notify"
-      size="sm"
-      aria-pressed={notified}
-      // Not `disabled`: that would swap in the grey disabled style, and the
-      // set state should keep its Notify_Success look.
-      aria-disabled={notified || isPending}
-      onClick={() => {
-        if (notified || isPending) return
-        requireAuth(() => notify(movie.slug))
-      }}
-      className="aria-disabled:cursor-default"
-    >
-      {notified ? <Check className="size-4" /> : <Bell className="size-4" />}
-      {notified ? "Reminder set" : isPending ? "Setting…" : "Notify Me"}
-    </Button>
+    <div className="flex items-center gap-2">
+      <Button
+        variant="notify"
+        size="sm"
+        aria-pressed={notified}
+        // Not `disabled`: that would swap in the grey disabled style, and the
+        // set state should keep its Notify_Success look.
+        aria-disabled={notified || isPending}
+        onClick={() => {
+          if (notified || isPending) return
+          requireAuth(() => notify(movie.slug))
+        }}
+        className="aria-disabled:cursor-default"
+      >
+        {notified ? <Check className="size-4" /> : <Bell className="size-4" />}
+        {notified ? "Reminder set" : isPending ? "Setting…" : failed ? "Try again" : "Notify Me"}
+      </Button>
+      {/* Not in Figma. The brief: a failed request says so and offers a
+          retry; the button itself is the retry. */}
+      {failed && (
+        <p role="alert" className="type-label-s text-primary">
+          Couldn't set it.
+        </p>
+      )}
+    </div>
   )
 }

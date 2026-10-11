@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { AxiosError } from "axios"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 
 import type { ApiError } from "@/API/types"
@@ -92,11 +93,18 @@ const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => {
 
 type LoginDialogProps = LoginFormProps & {
   open: boolean
+  /** Opened because the session ran out (a 401), not by the user. */
+  expired?: boolean
   onOpenChange: (open: boolean) => void
 }
 
 /** Login modal (Figma 269:4439). */
-export const LoginDialog = ({ open, onOpenChange, ...formProps }: LoginDialogProps) => {
+export const LoginDialog = ({ open, expired = false, onOpenChange, ...formProps }: LoginDialogProps) => {
+  // The provider resets `expired` as the dialog closes, which would swap the
+  // subtitle during the fade-out. Follow it only while open.
+  const [shownExpired, setShownExpired] = useState(expired)
+  if (open && expired !== shownExpired) setShownExpired(expired)
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {/* Creative liberty: the auth modals read small at 1920, so they are
@@ -105,7 +113,11 @@ export const LoginDialog = ({ open, onOpenChange, ...formProps }: LoginDialogPro
       <DialogContent className="w-100.75 [zoom:1.1]">
         <DialogHeader>
           <DialogTitle>Log in</DialogTitle>
-          <DialogDescription>Welcome back to Kino XII</DialogDescription>
+          {/* The expired line isn't in Figma; the brief names the reason
+              (session expired), so the modal doesn't appear unexplained. */}
+          <DialogDescription>
+            {shownExpired ? "Your session expired. Log in to continue." : "Welcome back to Kino XII"}
+          </DialogDescription>
         </DialogHeader>
         {/* Inside the content so it unmounts on close — each open starts clean. */}
         <LoginForm {...formProps} />

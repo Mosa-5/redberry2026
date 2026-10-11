@@ -240,6 +240,8 @@ const BookingFlow = ({ session, restoredHold }: BookingFlowProps) => {
         // both carry a message written for the user; show it as given.
         setNotice(data.message)
       } else if (status !== 401) {
+        // A 401 only gets here if the user closed the login modal instead
+        // of signing back in (a login replays the hold); nothing to show.
         setNotice("Couldn't hold your seats. Please try again.")
       }
     }

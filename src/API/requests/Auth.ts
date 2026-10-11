@@ -16,7 +16,7 @@ export type RegisterInput = {
 
 /** A 401 here means wrong credentials, not an expired session. */
 export const login = async (input: LoginInput): Promise<AuthSession> => {
-  const response = await httpClient.post<{ data: AuthSession }>("/login", input)
+  const response = await httpClient.post<{ data: AuthSession }>("/login", input, { reauth: false })
   return response.data.data
 }
 
@@ -37,12 +37,12 @@ export const register = async ({ passwordConfirmation, avatar, ...fields }: Regi
 
 /** Revokes only the current token. Clear it locally whatever the response. */
 export const logout = async (): Promise<void> => {
-  await httpClient.post("/logout")
+  await httpClient.post("/logout", undefined, { reauth: false })
 }
 
 /** The signed-in user. Call on boot when a token is stored; 401 means it's stale. */
 export const me = async (): Promise<User> => {
-  const response = await httpClient.get<{ data: User }>("/me")
+  const response = await httpClient.get<{ data: User }>("/me", { reauth: false })
   return response.data.data
 }
 

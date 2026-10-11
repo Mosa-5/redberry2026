@@ -36,7 +36,7 @@ export const hold = async (holdId: string): Promise<SeatHold> => {
 
 /** Frees the seats at once. Not for going back from checkout to the map. */
 export const releaseHold = async (holdId: string): Promise<void> => {
-  await httpClient.delete(`/holds/${holdId}`)
+  await httpClient.delete(`/holds/${holdId}`, { reauth: false })
 }
 
 export type OrderInput = {

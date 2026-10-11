@@ -18,6 +18,12 @@ const queryClient = new QueryClient({
         return count < 2 && (status === undefined || status >= 500)
       },
     },
+    mutations: {
+      // The default ("online") pauses a mutation while the browser is
+      // offline, so the button sits on "Setting…" with no error. Send it
+      // anyway: it fails at once and the button shows its message and retry.
+      networkMode: 'always',
+    },
   },
 })
 

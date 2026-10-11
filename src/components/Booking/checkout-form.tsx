@@ -66,7 +66,8 @@ export const CheckoutForm = ({ user, holdId, createOrder, onPaid, onConflict, on
         onConflict(data.contested ?? [])
         return
       }
-      // A 401 is handled by logging out; nothing to show here.
+      // A 401 only gets here if the user closed the login modal instead of
+      // signing back in (a login replays the order); nothing to show.
       if (status === 401) return
       applyServerErrors(error, setError, FIELDS)
     }
