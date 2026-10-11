@@ -1,75 +1,52 @@
-# React + TypeScript + Vite
+# Kino XII
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A cinema booking app built for the Redberry Bootcamp XII assignment. Browse films, filter sessions across four venues, pick seats on a live hall map and buy tickets.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Home:** featured films carousel, recently viewed, Now Playing and Coming Soon (with Notify Me).
+- **Sessions:** filters for venue, date, format, language and time of day, sorting and pagination, all kept in the URL.
+- **Film page:** details, a 7-day session picker grouped by venue and hall, and an age gate for 16+ and 18+ titles.
+- **Booking:** a two-step modal. Pick up to 3 seats on a zoomable hall map with ticket types, then hold them for 8 minutes and check out. Handles seats taken by someone else (409), hold expiry and restoring a hold after a reload.
+- **Profile:** personal information with validation and profile status, and My Tickets with upcoming and past orders and refunds.
+- **Auth:** login and sign-up modals. A protected action continues after logging in, and an expired session opens the login modal and replays the interrupted request.
 
-## React Compiler
+## Tech stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+React 19, TypeScript, Vite, Tailwind CSS 4, shadcn/ui (Radix), TanStack Query, React Router, react-hook-form with zod, axios, react-zoom-pan-pinch.
 
-## Expanding the ESLint configuration
+## Getting started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Requires Node.js 22.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+cp .env.example .env
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+`.env` holds `VITE_BASE_URL`, the API's base URL. The value in `.env.example` points to the bootcamp API.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Scripts
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Starts the dev server |
+| `npm run build` | Type-checks and builds to `dist/` |
+| `npm run preview` | Serves the production build locally |
+| `npm run lint` | Runs ESLint |
+
+## Project structure
 
 ```
+src/
+├── api/            axios client, token store, request functions, API types
+├── reactQuery/     query and mutation hooks (cache keys, invalidation)
+├── components/     feature folders (auth, booking, home, movie, profile, sessions, ...) and shadcn ui/
+├── pages/          route components
+├── layouts/        the shared header and footer shell
+├── hooks/          shared hooks
+└── lib/            formatting, dates and small local stores
+```
+
+Files are kebab-case and folders are camelCase.
