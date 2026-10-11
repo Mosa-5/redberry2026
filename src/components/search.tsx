@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/skeleton"
 import { ErrorMessage, StateMessage } from "@/components/state-message"
 import { Button } from "@/components/ui/button"
 import { useDebounce } from "@/hooks/use-debounce"
-import { useGetSearch } from "@/reactQuery/query/catalogue"
+import { useGetSearch } from "@/reactQuery/queries/catalogue"
 
 export type SearchResult = {
   id: string

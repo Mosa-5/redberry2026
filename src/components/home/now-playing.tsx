@@ -4,7 +4,7 @@ import Popcorn from "@/assets/icons/popcorn.svg?react"
 import { CardBig, CardBigSkeleton } from "@/components/cards/card-big"
 import { MovieRow } from "@/components/movie-row"
 import { ErrorMessage, StateMessage } from "@/components/state-message"
-import { useGetNowPlayingMovies } from "@/reactQuery/query/catalogue"
+import { useGetNowPlayingMovies } from "@/reactQuery/queries/catalogue"
 
 type NowPlayingProps = {
   /** Caps how many titles the API returns. Omit for the whole catalogue. */

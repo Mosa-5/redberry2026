@@ -11,8 +11,8 @@ import { Skeleton } from "@/components/skeleton"
 import { ErrorMessage, StateMessage } from "@/components/state-message"
 import { Button } from "@/components/ui/button"
 import { recordView } from "@/lib/recently-viewed"
-import { useGetMe } from "@/reactQuery/query/auth"
-import { useGetMovieDetail } from "@/reactQuery/query/catalogue"
+import { useGetMe } from "@/reactQuery/queries/auth"
+import { useGetMovieDetail } from "@/reactQuery/queries/catalogue"
 
 /** Banner-sized block plus the two columns' headings while the film loads. */
 const MovieSkeleton = () => {

@@ -71,7 +71,9 @@ export const HeroSlide = ({ movie, active }: HeroSlideProps) => {
               </Link>
             </Button>
             <Button variant="transparent" asChild>
-              <Link to={`/movies/${movie.slug}`}>All sessions</Link>
+              {/* The brief doesn't say where it goes; the Sessions page is
+                  what the label names (it has no per-film filter). */}
+              <Link to="/sessions">All sessions</Link>
             </Button>
           </div>
         </div>

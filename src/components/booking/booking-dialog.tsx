@@ -16,9 +16,9 @@ import { fromIsoDate } from "@/lib/dates"
 import { clearSavedHold, readSavedHold, saveHold } from "@/lib/saved-hold"
 import { cn } from "@/lib/utils"
 import { useCreateOrder, useHoldSeats, type SeatConflict } from "@/reactQuery/mutations/booking"
-import { useGetMe } from "@/reactQuery/query/auth"
-import { useGetHold, useGetSessionDetail } from "@/reactQuery/query/booking"
-import { useGetFilterOptions } from "@/reactQuery/query/sessions"
+import { useGetMe } from "@/reactQuery/queries/auth"
+import { useGetHold, useGetSessionDetail } from "@/reactQuery/queries/booking"
+import { useGetFilterOptions } from "@/reactQuery/queries/sessions"
 
 export type BookingStep = "seats" | "checkout"
 

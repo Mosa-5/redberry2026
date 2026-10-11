@@ -1,7 +1,7 @@
 import { HeroCarousel } from "@/components/hero/hero-carousel";
-import { ComingSoon } from "@/components/sections/coming-soon";
-import { NowPlaying } from "@/components/sections/now-playing";
-import { RecentlyViewed } from "@/components/sections/recently-viewed";
+import { ComingSoon } from "@/components/home/coming-soon";
+import { NowPlaying } from "@/components/home/now-playing";
+import { RecentlyViewed } from "@/components/home/recently-viewed";
 
 const Home = () => {
   return (

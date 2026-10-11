@@ -16,7 +16,7 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel"
-import { useGetFeaturedMovies } from "@/reactQuery/query/catalogue"
+import { useGetFeaturedMovies } from "@/reactQuery/queries/catalogue"
 
 type HeroCarouselProps = {
   className?: string

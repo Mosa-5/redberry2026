@@ -8,9 +8,9 @@ import { ProfileStatus } from "@/components/profile/profile-status"
 import { Skeleton } from "@/components/skeleton"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useGetMe } from "@/reactQuery/query/auth"
-import { useGetFilterOptions } from "@/reactQuery/query/sessions"
-import { useGetTickets } from "@/reactQuery/query/tickets"
+import { useGetMe } from "@/reactQuery/queries/auth"
+import { useGetFilterOptions } from "@/reactQuery/queries/sessions"
+import { useGetTickets } from "@/reactQuery/queries/tickets"
 
 const toAgeRatings = (options: FilterOptions) => options.ageRatings
 const toUpcomingCount = (orders: Order[]) => orders.filter((order) => order.isUpcoming).length

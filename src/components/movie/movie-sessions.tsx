@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/skeleton"
 import { ErrorMessage, StateMessage } from "@/components/state-message"
 import { fromIsoDate, nextDays } from "@/lib/dates"
 import { releaseLabel } from "@/lib/format"
-import { useGetMovieSessions } from "@/reactQuery/query/catalogue"
+import { useGetMovieSessions } from "@/reactQuery/queries/catalogue"
 
 const weekdayFormat = new Intl.DateTimeFormat("en-GB", { weekday: "short" })
 

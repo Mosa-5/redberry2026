@@ -8,7 +8,7 @@ import { TicketCard, TicketCardSkeleton } from "@/components/profile/ticket-card
 import { ErrorMessage, StateMessage } from "@/components/state-message"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { useGetTickets } from "@/reactQuery/query/tickets"
+import { useGetTickets } from "@/reactQuery/queries/tickets"
 
 type View = "upcoming" | "past"
 

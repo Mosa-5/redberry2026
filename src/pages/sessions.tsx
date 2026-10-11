@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/skeleton"
 import { ErrorMessage, StateMessage } from "@/components/state-message"
 import { Button } from "@/components/ui/button"
 import { useSessionFilters } from "@/hooks/use-session-filters"
-import { useGetFilterOptions, useGetSessions } from "@/reactQuery/query/sessions"
+import { useGetFilterOptions, useGetSessions } from "@/reactQuery/queries/sessions"
 
 /** Sessions page (Figma 272:7289, filtered 276:9167). Open to everyone. */
 const Sessions = () => {

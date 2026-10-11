@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router";
 
-import { useGetMe } from "@/reactQuery/query/auth";
+import { useGetMe } from "@/reactQuery/queries/auth";
 
 import { useAuthDialog } from "./auth/auth-dialog-context";
 import { ProfileMenu } from "./profile-menu";

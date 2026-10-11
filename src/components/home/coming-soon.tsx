@@ -4,7 +4,7 @@ import Bell from "@/assets/icons/bell.svg?react"
 import { CardMedium, CardMediumSkeleton } from "@/components/cards/card-medium"
 import { MovieRow } from "@/components/movie-row"
 import { ErrorMessage, StateMessage } from "@/components/state-message"
-import { useGetComingSoonMovies } from "@/reactQuery/query/catalogue"
+import { useGetComingSoonMovies } from "@/reactQuery/queries/catalogue"
 
 type ComingSoonProps = {
   /** Caps how many titles the API returns. Omit for the whole catalogue. */

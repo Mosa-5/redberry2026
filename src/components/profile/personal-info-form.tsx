@@ -10,7 +10,7 @@ import { SelectItem } from "@/components/ui/select"
 import { yearsAgo } from "@/lib/dates"
 import { applyServerErrors } from "@/lib/form-errors"
 import { useUpdateProfile } from "@/reactQuery/mutations/auth"
-import { useGetFilterOptions } from "@/reactQuery/query/sessions"
+import { useGetFilterOptions } from "@/reactQuery/queries/sessions"
 
 const toVenues = (options: FilterOptions) => options.venues
 

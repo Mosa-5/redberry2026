@@ -11,7 +11,7 @@ import heldStripes from "@/assets/seat-held-stripes.svg"
 import { Skeleton } from "@/components/skeleton"
 import { ErrorMessage } from "@/components/state-message"
 import { cn } from "@/lib/utils"
-import { useGetSeatMap } from "@/reactQuery/query/booking"
+import { useGetSeatMap } from "@/reactQuery/queries/booking"
 
 /** "STALLS · ROWS A-E". Labels come from the data: hall D skips I. */
 const sectionTitle = (section: SeatMapData["sections"][number]) => {
