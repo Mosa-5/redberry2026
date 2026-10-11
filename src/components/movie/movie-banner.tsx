@@ -19,6 +19,8 @@ export const MovieBanner = ({ movie }: { movie: MovieDetail }) => {
         />
       )}
       <div className="absolute inset-0 bg-scrim/20 backdrop-blur-[5px]" />
+      {/* Same left-heavy gradient as the home hero, so the title stays readable on light backdrops. */}
+      <div className="absolute inset-0 bg-linear-to-l from-black/8 to-black/80" />
 
       <div className="absolute top-38 left-15 flex items-end gap-8.5">
         <img

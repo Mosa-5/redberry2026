@@ -2,6 +2,8 @@
 
 A cinema booking app built for the Redberry Bootcamp XII assignment. Browse films, filter sessions across four venues, pick seats on a live hall map and buy tickets.
 
+**Live:** https://redberry2026.vercel.app/
+
 ## Features
 
 - **Home:** featured films carousel, recently viewed, Now Playing and Coming Soon (with Notify Me).
