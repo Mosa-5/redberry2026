@@ -4,7 +4,7 @@ import { keepPreviousData } from "@tanstack/react-query"
 import { Command } from "cmdk"
 import { cn } from "@/lib/utils"
 
-import type { Movie } from "@/API/types"
+import type { Movie } from "@/api/types"
 import Close from "@/assets/icons/close.svg?react"
 import MagnifyingGlass from "@/assets/icons/magnifying-glass.svg?react"
 import Popcorn from "@/assets/icons/popcorn.svg?react"

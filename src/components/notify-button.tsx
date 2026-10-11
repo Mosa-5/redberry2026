@@ -1,7 +1,7 @@
-import type { Movie } from "@/API/types"
+import type { Movie } from "@/api/types"
 import Bell from "@/assets/icons/bell.svg?react"
 import Check from "@/assets/icons/check.svg?react"
-import { useAuthDialog } from "@/components/Auth/auth-dialog-context"
+import { useAuthDialog } from "@/components/auth/auth-dialog-context"
 import { Button } from "@/components/ui/button"
 import { useNotifyMovie } from "@/reactQuery/mutations/catalogue"
 

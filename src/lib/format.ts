@@ -1,4 +1,4 @@
-import type { SessionDetail } from "@/API/types"
+import type { SessionDetail } from "@/api/types"
 import { fromIsoDate, shortDay, toIsoDate } from "@/lib/dates"
 
 /**

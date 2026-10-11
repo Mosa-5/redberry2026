@@ -8,8 +8,8 @@ import {
   movieSessions,
   nowPlayingMovies,
   searchMovies,
-} from "@/API/requests/Catalogue"
-import type { Movie, MovieDetail, VenueSessions } from "@/API/types"
+} from "@/api/requests/catalogue"
+import type { Movie, MovieDetail, VenueSessions } from "@/api/types"
 import type { HookOptions } from "@/reactQuery/types"
 
 export const useGetFeaturedMovies = <T = Movie[]>(

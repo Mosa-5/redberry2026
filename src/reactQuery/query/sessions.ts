@@ -1,8 +1,8 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query"
 import type { AxiosError } from "axios"
 
-import { filterOptions, sessions, type SessionFilters } from "@/API/requests/Sessions"
-import type { FilterOptions, SessionsPage } from "@/API/types"
+import { filterOptions, sessions, type SessionFilters } from "@/api/requests/sessions"
+import type { FilterOptions, SessionsPage } from "@/api/types"
 import type { HookOptions } from "@/reactQuery/types"
 
 export const useGetFilterOptions = <T = FilterOptions>(

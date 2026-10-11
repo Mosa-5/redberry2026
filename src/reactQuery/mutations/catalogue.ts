@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import type { AxiosError } from "axios"
 
-import { notifyMovie } from "@/API/requests/Catalogue"
-import type { ApiError, Movie, MovieDetail } from "@/API/types"
+import { notifyMovie } from "@/api/requests/catalogue"
+import type { ApiError, Movie, MovieDetail } from "@/api/types"
 
 export const useNotifyMovie = () => {
   const queryClient = useQueryClient()

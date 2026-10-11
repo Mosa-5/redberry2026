@@ -1,8 +1,8 @@
 import { skipToken, useQuery, type UseQueryResult } from "@tanstack/react-query"
 import type { AxiosError } from "axios"
 
-import { hold, seatMap, session } from "@/API/requests/Booking"
-import type { SeatHold, SeatMap, SessionDetail } from "@/API/types"
+import { hold, seatMap, session } from "@/api/requests/booking"
+import type { SeatHold, SeatMap, SessionDetail } from "@/api/types"
 import type { HookOptions } from "@/reactQuery/types"
 
 /** The booking modal header. Seeded from the clicked card, so it shows at once. */

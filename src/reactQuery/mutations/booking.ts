@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import type { AxiosError } from "axios"
 
-import { createOrder, holdSeats, releaseHold, type HoldInput, type OrderInput } from "@/API/requests/Booking"
-import type { ApiError, Order, SeatHold } from "@/API/types"
+import { createOrder, holdSeats, releaseHold, type HoldInput, type OrderInput } from "@/api/requests/booking"
+import type { ApiError, Order, SeatHold } from "@/api/types"
 
 /** A 409 from holds or orders names the seats that were lost. */
 export type SeatConflict = ApiError & { contested?: string[] }

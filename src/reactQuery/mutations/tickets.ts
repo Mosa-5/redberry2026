@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import type { AxiosError } from "axios"
 
-import { refundOrder } from "@/API/requests/Tickets"
-import type { ApiError, Order } from "@/API/types"
+import { refundOrder } from "@/api/requests/tickets"
+import type { ApiError, Order } from "@/api/types"
 
 export const useRefundOrder = () => {
   const queryClient = useQueryClient()

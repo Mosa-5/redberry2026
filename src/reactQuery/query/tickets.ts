@@ -1,8 +1,8 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query"
 import type { AxiosError } from "axios"
 
-import { tickets } from "@/API/requests/Tickets"
-import type { Order } from "@/API/types"
+import { tickets } from "@/api/requests/tickets"
+import type { Order } from "@/api/types"
 import type { HookOptions } from "@/reactQuery/types"
 
 /**

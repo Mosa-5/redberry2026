@@ -1,7 +1,7 @@
 import { useNavigate, useSearchParams } from "react-router"
 
-import type { SessionFilters } from "@/API/requests/Sessions"
-import type { SessionSort, TimeBand } from "@/API/types"
+import type { SessionFilters } from "@/api/requests/sessions"
+import type { SessionSort, TimeBand } from "@/api/types"
 import { toIsoDate } from "@/lib/dates"
 
 const SORTS: SessionSort[] = ["time_asc", "time_desc", "price_asc", "price_desc", "title_asc"]

@@ -1,8 +1,8 @@
 import { skipToken, useQuery, type UseQueryResult } from "@tanstack/react-query"
 import type { AxiosError } from "axios"
 
-import { me } from "@/API/requests/Auth"
-import type { User } from "@/API/types"
+import { me } from "@/api/requests/auth"
+import type { User } from "@/api/types"
 import { useToken } from "@/hooks/use-token"
 import type { HookOptions } from "@/reactQuery/types"
 

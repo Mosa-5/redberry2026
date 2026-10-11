@@ -1,13 +1,14 @@
 import { Route, Routes } from "react-router"
 
-import { AuthDialogProvider } from "./components/Auth/auth-dialog-provider"
-import { AuthGuard } from "./components/Auth/auth-guard"
-import { BookingProvider } from "./components/Booking/booking-provider"
-import DashboardLayout from "./layouts/dashboardLayout"
-import Home from "./pages/Home"
-import Movie from "./pages/Movie"
-import Profile from "./pages/Profile"
-import Sessions from "./pages/Sessions"
+import { AuthDialogProvider } from "./components/auth/auth-dialog-provider"
+import { AuthGuard } from "./components/auth/auth-guard"
+import { BookingProvider } from "./components/booking/booking-provider"
+import RootLayout from "./layouts/root-layout"
+import Home from "./pages/home"
+import Movie from "./pages/movie"
+import NotFound from "./pages/not-found"
+import Profile from "./pages/profile"
+import Sessions from "./pages/sessions"
 
 const App = () => {
   return (
@@ -17,13 +18,14 @@ const App = () => {
     <AuthDialogProvider>
       <BookingProvider>
         <Routes>
-          <Route element={<DashboardLayout />}>
+          <Route element={<RootLayout />}>
             <Route index element={<Home />} />
             <Route path="movies/:slug" element={<Movie />} />
             <Route path="sessions" element={<Sessions />} />
             <Route element={<AuthGuard />}>
               <Route path="profile" element={<Profile />} />
             </Route>
+            <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
       </BookingProvider>

@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router";
 
 import { useGetMe } from "@/reactQuery/query/auth";
 
-import { useAuthDialog } from "./Auth/auth-dialog-context";
+import { useAuthDialog } from "./auth/auth-dialog-context";
 import { ProfileMenu } from "./profile-menu";
 import { Search } from "./search";
 import { Skeleton } from "./skeleton";

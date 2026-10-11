@@ -9,9 +9,9 @@ import {
   type LoginInput,
   type ProfileInput,
   type RegisterInput,
-} from "@/API/requests/Auth"
-import { setToken } from "@/API/token"
-import type { ApiError, AuthSession, User } from "@/API/types"
+} from "@/api/requests/auth"
+import { setToken } from "@/api/token"
+import type { ApiError, AuthSession, User } from "@/api/types"
 
 /**
  * Shared by login and register. The user goes into the cache before the

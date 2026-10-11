@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 
-import type { User } from "@/API/types"
+import type { User } from "@/api/types"
 import StatusComplete from "@/assets/icons/status-complete.svg?react"
 import StatusIncomplete from "@/assets/icons/status-incomplete.svg?react"
 

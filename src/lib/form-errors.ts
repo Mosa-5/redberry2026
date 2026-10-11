@@ -1,7 +1,7 @@
 import type { AxiosError } from "axios"
 import type { FieldValues, Path, UseFormSetError } from "react-hook-form"
 
-import type { ApiError } from "@/API/types"
+import type { ApiError } from "@/api/types"
 
 /**
  * Puts a failed request's message where the user will see it, following

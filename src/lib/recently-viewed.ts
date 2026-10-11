@@ -1,6 +1,6 @@
 import { useMemo, useSyncExternalStore } from "react"
 
-import type { Movie } from "@/API/types"
+import type { Movie } from "@/api/types"
 
 // The API has no history endpoint, so views are kept in the browser. Whole
 // Movie objects are stored because there is no batch lookup by slug; storing
